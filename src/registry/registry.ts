@@ -451,6 +451,33 @@ export const SEED_RECORDS: BuildingBlockRecord[] = [
     positiveNote: "Este registry é um primeiro órgão do Mother Kernel: dados e regras de estado fora das telas.",
   }),
 
+  B({
+    id: "tool-intake-studio",
+    canonicalName: "Intake Studio · entrada governada",
+    family: "Participação",
+    kind: "tool",
+    description:
+      "Superfície de intake Crowd-Sourced: transforma qualquer objeto HUI (trabalho, predecessor, experimento, manifestação) em rascunho de BuildingBlockRecord conforme o esquema, com vocabulários controlados, linhagem, por-que-acreditamos, evidência e positiveNote. Rascunho ≠ adoção: exporta fragmento hui.constellation.snapshot/v1 para o Snapshot Diff; nunca muta o registry vivo.",
+    sourceRefs: [
+      src({ id: "s-intake-src", sourceClass: "local-source", label: "src/apps/IntakeStudio.tsx · src/apps/intakeModel.ts", role: "primary", access: "public", observedAt: O, sha: "bca6afd52e04d99fe15413508a8738e02c9c24c9", whyWeBelieveThis: "Implementado em source na tranche sucessora do parent bca6afd; validação e sanitização cobertas por testes." }),
+      src({ id: "s-intake-dir", sourceClass: "founder-direction", label: "Direção fundadora — todo trabalho útil deve tornar-se encontrável", role: "lineage", access: "public", observedAt: O, whyWeBelieveThis: "Prioridade declarada:TOOLS + FUNCTIONALITY > explicação estática; participação com autoria e provenance." }),
+    ],
+    lifecycle: "IMPLEMENTED_CANDIDATE",
+    currentness: "prototype",
+    evidence: { rung: 3, basis: "Implementação em source + rota local #/intake funcional + suite Vitest cobrindo modelo, validação e handoff." },
+    visibility: "public",
+    publicability: "public-safe",
+    route: "/intake",
+    predecessorIds: ["tool-snapshot-diff"],
+    relatedIds: ["crowd-sourced", "cap-inspector", "cap-lenses"],
+    capabilities: [
+      { id: "c-intake-open", label: "Registrar um building block", availability: "now", action: { kind: "open-route", target: "/intake" } },
+      { id: "c-intake-handoff", label: "Encaminhar fragmento ao Snapshot Diff", availability: "now", action: { kind: "open-route", target: "/registry" } },
+    ],
+    unknowns: ["Fluxo de triagem humana dos rascunhos exportados ainda não instrumentado"],
+    positiveNote: "O elo que faltava no ciclo: intake → diff → triagem → registry. Toda adição futura da constelação pode entrar por aqui, governada e rastreável.",
+  }),
+
   /* ---------------- participação ---------------- */
   ...[
     ["crowd-sourced", "Crowd-Sourced", "Intakes progressivos com consentimento, autoria, provenance e triage.", "Intakes progressivos com autoria e provenance são a porta de entrada ética de toda a arquitetura."],

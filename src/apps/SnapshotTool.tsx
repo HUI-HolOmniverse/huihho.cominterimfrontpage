@@ -3,10 +3,11 @@
 /*  Sem credenciais no browser: consome snapshot estático/gerado.      */
 /* ------------------------------------------------------------------ */
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { REGISTRY, REGISTRY_META } from "../registry/queries";
 import { diffSnapshots, makeSyntheticVariant, publicSafeSnapshot, type DiffKind, type DiffResult } from "../registry/diff";
 import type { BuildingBlockRecord } from "../registry/model";
+import { FRAGMENT_KEY } from "./intakeModel";
 
 const KIND_META: Record<DiffKind, { label: string; tone: string }> = {
   reclassified: { label: "reclassificado", tone: "border-ember-400/50 text-ember-300 bg-ember-400/8" },
@@ -23,6 +24,21 @@ export default function SnapshotTool() {
   const [showUnchanged, setShowUnchanged] = useState(false);
   const [sourceLabel, setSourceLabel] = useState("");
   const fileRef = useRef<HTMLInputElement | null>(null);
+
+  /* handoff do Intake Studio: fragmento pré-carregado, uma única vez */
+  useEffect(() => {
+    try {
+      const incoming = sessionStorage.getItem(FRAGMENT_KEY);
+      if (incoming) {
+        sessionStorage.removeItem(FRAGMENT_KEY);
+        onPaste(incoming);
+        setSourceLabel("fragmento do Intake Studio");
+      }
+    } catch {
+      /* sessão sem storage — intake manual segue disponível */
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const runDiff = (incoming: unknown[], label: string) => {
     try {

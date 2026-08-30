@@ -10,6 +10,7 @@ import IcebergAtlas from "./iceberg/IcebergAtlas";
 import LensPage from "./LensPage";
 import Explorer from "./apps/Explorer";
 import Logoi from "./apps/Logoi";
+import IntakeStudio from "./apps/IntakeStudio";
 
 function SkipLink() {
   return (
@@ -93,6 +94,7 @@ export default function App() {
           <Route path="/registry" element={<LensPage />} />
           <Route path="/holomniverse" element={<Explorer />} />
           <Route path="/holo-logoi" element={<Logoi />} />
+          <Route path="/intake" element={<IntakeStudio />} />
           <Route path="*" element={<Portal />} />
         </Routes>
       </HashRouter>

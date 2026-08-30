@@ -126,6 +126,35 @@ export function Crowd() {
             </Reveal>
           ))}
         </div>
+
+        <Reveal delay={220}>
+          <a
+            href="#/intake"
+            className="group mt-8 flex flex-wrap items-center gap-x-8 gap-y-4 rounded-lg border border-gild-400/35 bg-gradient-to-r from-gild-400/8 to-transparent px-7 py-6 transition-all duration-300 hover:border-gild-400/70 hover:-translate-y-1 hover:shadow-[0_10px_40px_rgba(217,166,63,0.12)]"
+          >
+            <span className="grid place-items-center w-12 h-12 rounded-full border border-gild-400/50 text-gild-300 transition-transform duration-500 group-hover:rotate-90" aria-hidden="true">
+              <svg viewBox="0 0 24 24" className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M12 4v12M7 11l5 5 5-5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M4 19.5h16" strokeLinecap="round" />
+              </svg>
+            </span>
+            <span className="flex-1 min-w-[240px]">
+              <span className="block font-display text-xl sm:text-2xl font-medium text-mist-50 group-hover:text-gild-300 transition-colors duration-300">
+                Intake Studio — registre um building block
+              </span>
+              <span className="block text-[13px] text-mist-400 leading-relaxed mt-1">
+                Trabalho útil, predecessor ou experimento entra como rascunho governado: vocabulário controlado, linhagem,
+                evidência e valor de continuidade. <span className="text-gild-300">Rascunho ≠ adoção.</span>
+              </span>
+            </span>
+            <span className="font-mono text-[10px] tracking-[0.18em] uppercase text-gild-300 flex items-center gap-2.5">
+              abrir intake
+              <svg viewBox="0 0 20 12" className="w-4 h-2.5 transition-transform duration-300 group-hover:translate-x-1" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                <path d="M1 6h16M12 1.5 17 6l-5 4.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </span>
+          </a>
+        </Reveal>
       </div>
     </section>
   );

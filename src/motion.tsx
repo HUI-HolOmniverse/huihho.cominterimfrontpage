@@ -113,6 +113,7 @@ export function Scramble({
   const [ref, inView] = useInView<HTMLSpanElement>(0.4);
   const [out, setOut] = useState(reduced ? text : "");
   const done = useRef(false);
+  const intervalRef = useRef<number | null>(null);
 
   const run = useCallback(() => {
     if (done.current) return;
@@ -137,13 +138,23 @@ export function Scramble({
       if (locked >= total) {
         setOut(text);
         window.clearInterval(id);
+        intervalRef.current = null;
       }
     }, speed);
+    intervalRef.current = id;
   }, [reduced, text, speed]);
 
   useEffect(() => {
     if (inView) run();
   }, [inView, run]);
+
+  /* nunca vaza timer após desmontagem */
+  useEffect(
+    () => () => {
+      if (intervalRef.current !== null) window.clearInterval(intervalRef.current);
+    },
+    [],
+  );
 
   useEffect(() => {
     if (reduced) setOut(text);

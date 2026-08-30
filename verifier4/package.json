@@ -1,0 +1,9 @@
+{
+  "name": "hui-verifier-run4",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Execução da suite Vitest com log persistido em verifier4/vitest-run.log (evidência inspecionável).",
+  "scripts": {
+    "prepare": "node ../node_modules/vitest/vitest.mjs run --root .. --reporter=verbose --no-color > vitest-run.log 2>&1 || { tail -n 40 vitest-run.log; exit 1; }"
+  }
+}

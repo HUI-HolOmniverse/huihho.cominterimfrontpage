@@ -3,7 +3,7 @@
 /*  Três perguntas honestas sobre o MESMO registry.                    */
 /* ------------------------------------------------------------------ */
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CURRENTNESS,
   CURRENTNESS_LABEL,
@@ -17,6 +17,7 @@ import { REGISTRY, REGISTRY_META, applyFilters, parseQuery, groupByCurrentness, 
 import { useInspector, LifecycleChip, RungChip } from "./registry/Inspector";
 import { Scramble } from "./motion";
 import SnapshotTool from "./apps/SnapshotTool";
+import { LENS_FOCUS_KEY } from "./apps/intakeModel";
 
 type Lens = "currentness" | "evidence" | "source" | "snapshot";
 
@@ -28,9 +29,24 @@ const LENS_META: { id: Lens; label: string; question: string }[] = [
 ];
 
 export default function LensPage() {
-  const [lens, setLens] = useState<Lens>("currentness");
+  const [lens, setLens] = useState<Lens>(() => {
+    try {
+      return sessionStorage.getItem(LENS_FOCUS_KEY) === "snapshot" ? "snapshot" : "currentness";
+    } catch {
+      return "currentness";
+    }
+  });
   const [query, setQuery] = useState("");
   const { open } = useInspector();
+
+  /* foco de lente vindo de handoff é consumido uma única vez */
+  useEffect(() => {
+    try {
+      sessionStorage.removeItem(LENS_FOCUS_KEY);
+    } catch {
+      /* sem storage — lente padrão permanece */
+    }
+  }, []);
 
   const records = useMemo(() => (query.trim() ? applyFilters(REGISTRY, parseQuery(query)) : REGISTRY), [query]);
 
