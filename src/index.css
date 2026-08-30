@@ -114,6 +114,20 @@ body {
     transform: translateY(-9px);
   }
 }
+@keyframes kf-rise {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.anim-rise {
+  animation: kf-rise 0.55s cubic-bezier(0.2, 0.65, 0.25, 1) both;
+}
+
 @keyframes kf-pulse-ring {
   0% {
     transform: scale(0.85);
@@ -297,6 +311,7 @@ body {
   .anim-float,
   .anim-wave,
   .anim-wave-rev,
+  .anim-rise,
   .pulse-ring {
     animation: none !important;
   }

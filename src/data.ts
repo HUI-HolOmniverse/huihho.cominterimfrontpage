@@ -133,6 +133,7 @@ export const DOORS: Door[] = [
     cta: "Entrar",
     status: "CANDIDATE",
     accent: "lumen",
+    local: { label: "ferramenta local · Beholder Explorer", cta: "explorar fractal", hash: "#/holomniverse" },
   },
   {
     n: "03",
@@ -143,6 +144,7 @@ export const DOORS: Door[] = [
     cta: "Cultivar",
     status: "CANDIDATE",
     accent: "ember",
+    local: { label: "ferramenta local · ledger de termos", cta: "abrir o ledger", hash: "#/holo-logoi" },
   },
 ];
 

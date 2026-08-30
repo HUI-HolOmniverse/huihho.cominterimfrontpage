@@ -16,13 +16,15 @@ import {
 import { REGISTRY, REGISTRY_META, applyFilters, parseQuery, groupByCurrentness, groupByEvidence, groupBySourceClass } from "./registry/queries";
 import { useInspector, LifecycleChip, RungChip } from "./registry/Inspector";
 import { Scramble } from "./motion";
+import SnapshotTool from "./apps/SnapshotTool";
 
-type Lens = "currentness" | "evidence" | "source";
+type Lens = "currentness" | "evidence" | "source" | "snapshot";
 
 const LENS_META: { id: Lens; label: string; question: string }[] = [
   { id: "currentness", label: "Currentness", question: "O que está corrente — e o que permanece valioso sem estar?" },
   { id: "evidence", label: "Evidência", question: "Em qual degrau da escada governante cada bloco realmente está?" },
   { id: "source", label: "Fonte", question: "De onde vem cada afirmação — primária, derivada, pública ou protegida?" },
+  { id: "snapshot", label: "Snapshot", question: "Como um snapshot externo (ex.: PR #111) entra — reclassificando e retendo, sem apagar nada?" },
 ];
 
 export default function LensPage() {
@@ -211,11 +213,13 @@ export default function LensPage() {
           </div>
         )}
 
+        {lens === "snapshot" && <SnapshotTool />}
+
         <footer className="mt-20 border-t border-seam pt-8 flex flex-wrap gap-x-8 gap-y-2 font-mono text-[10px] tracking-[0.14em] uppercase text-mist-600">
           <span>HUI ≠ ICEBERG</span>
           <span>PRESENCE ≠ ENDORSEMENT</span>
           <span>HISTORICAL ≠ OBSOLETE</span>
-          <span>mesmo registry · três perguntas</span>
+          <span>mesmo registry · quatro perguntas</span>
         </footer>
       </main>
     </div>

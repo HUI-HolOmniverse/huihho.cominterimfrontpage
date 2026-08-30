@@ -8,6 +8,8 @@ import { Launcher } from "./Launcher";
 import { RegistryProvider } from "./registry/Inspector";
 import IcebergAtlas from "./iceberg/IcebergAtlas";
 import LensPage from "./LensPage";
+import Explorer from "./apps/Explorer";
+import Logoi from "./apps/Logoi";
 
 function SkipLink() {
   return (
@@ -89,6 +91,8 @@ export default function App() {
           <Route path="/" element={<Portal />} />
           <Route path="/iceberg" element={<IcebergAtlas />} />
           <Route path="/registry" element={<LensPage />} />
+          <Route path="/holomniverse" element={<Explorer />} />
+          <Route path="/holo-logoi" element={<Logoi />} />
           <Route path="*" element={<Portal />} />
         </Routes>
       </HashRouter>
