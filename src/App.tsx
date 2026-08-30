@@ -5,7 +5,26 @@ import { Opening, Doors, Fabric, Beholder } from "./sectionsA";
 import { CanonicalMap, Crowd, Topology, Publishing } from "./sectionsB";
 import { Constellation } from "./sectionsC";
 import { Launcher } from "./Launcher";
-import IcebergAtlas from "./IcebergAtlas";
+import { RegistryProvider } from "./registry/Inspector";
+import IcebergAtlas from "./iceberg/IcebergAtlas";
+import LensPage from "./LensPage";
+
+function SkipLink() {
+  return (
+    <a
+      href="#conteudo"
+      onClick={(e) => {
+        e.preventDefault();
+        const el = document.getElementById("conteudo");
+        el?.focus();
+        el?.scrollIntoView?.();
+      }}
+      className="skip-link"
+    >
+      pular para o conteúdo
+    </a>
+  );
+}
 
 function Portal() {
   const [launcherOpen, setLauncherOpen] = useState(false);
@@ -30,9 +49,10 @@ function Portal() {
     <div className="relative min-h-screen bg-ink-950 text-mist-200 font-body selection:bg-lumen-500/30">
       <div className="noise-overlay" aria-hidden="true" />
 
+      <SkipLink />
       <Header onLaunch={openLauncher} />
 
-      <main>
+      <main id="conteudo" tabIndex={-1}>
         <Opening />
         <Doors />
         <Fabric onLaunch={openLauncher} />
@@ -62,13 +82,16 @@ function ScrollToTop() {
 
 export default function App() {
   return (
-    <HashRouter>
-      <ScrollToTop />
-      <Routes>
-        <Route path="/" element={<Portal />} />
-        <Route path="/iceberg" element={<IcebergAtlas />} />
-        <Route path="*" element={<Portal />} />
-      </Routes>
-    </HashRouter>
+    <RegistryProvider>
+      <HashRouter>
+        <ScrollToTop />
+        <Routes>
+          <Route path="/" element={<Portal />} />
+          <Route path="/iceberg" element={<IcebergAtlas />} />
+          <Route path="/registry" element={<LensPage />} />
+          <Route path="*" element={<Portal />} />
+        </Routes>
+      </HashRouter>
+    </RegistryProvider>
   );
 }

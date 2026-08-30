@@ -75,7 +75,7 @@ export function Header({ onLaunch }: { onLaunch: () => void }) {
       }`}
     >
       <div className="mx-auto max-w-7xl px-5 sm:px-8 flex items-center gap-5">
-        <a href="https://huihho.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 group" aria-label="huihho.com — portal canônico">
+        <a href="https://huihho.com" target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 group" aria-label="huihho.com — referência da rota canônica (externa)">
           <Monogram className="w-9 h-9 transition-transform duration-500 group-hover:rotate-90" />
           <span className="leading-none">
             <span className="block font-display font-semibold text-xl tracking-tight text-mist-50">HUI</span>
@@ -99,7 +99,7 @@ export function Header({ onLaunch }: { onLaunch: () => void }) {
         <div className="ml-auto flex items-center gap-3 sm:gap-4">
           <span className="hidden sm:flex items-center gap-2 font-mono text-[9px] tracking-[0.22em] uppercase text-mist-500">
             <span className="w-1.5 h-1.5 rounded-full bg-lumen-400 anim-led" aria-hidden="true" />
-            canônico · live
+            public prototype · building
           </span>
           <button
             onClick={onLaunch}
@@ -216,7 +216,10 @@ export function Footer({ onLaunch }: { onLaunch: () => void }) {
             © {new Date().getFullYear()} HUI · provenance of intent · public work constellation
           </p>
           <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-mist-600">
-            portal canônico · readback confirmado
+            protótipo interim · readback externo pendente
+          </p>
+          <p className="font-mono text-[9px] tracking-[0.18em] uppercase text-mist-600/80 mt-2">
+            noindex ativo · PROTOTYPE ≠ PRODUCTION
             <span className="inline-block w-1.5 h-1.5 rounded-full bg-lumen-400 anim-led ml-2 align-middle" aria-hidden="true" />
           </p>
         </div>

@@ -1,0 +1,5 @@
+# huihho.cominterimfrontpage — protótipo interim de engenharia
+# PUBLIC PROTOTYPE · BUILDING — não é publicação canônica de huihho.com
+# Proteção mantida até liberação governada separada.
+User-agent: *
+Disallow: /

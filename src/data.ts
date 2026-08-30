@@ -190,7 +190,7 @@ export const EXTRA_LINKS = [
 
 /* ---------- legenda epistêmica ---------- */
 export const LEGEND: { status: EpistemicStatus; meaning: string; tone: "gild" | "lumen" | "mist" | "ember" }[] = [
-  { status: "ACCEPTED CODE", meaning: "Código aceito: rota publicada, autorizada e legível publicamente.", tone: "gild" },
+  { status: "ACCEPTED CODE", meaning: "Aceitação publicada em source. Não declara deploy, readback externo ou vigência — ACCEPTED ≠ DEPLOYED ≠ LIVE.", tone: "gild" },
   { status: "CANDIDATE", meaning: "Candidata: desenho público em amadurecimento, sem vigência declarada.", tone: "lumen" },
   { status: "binding-candidate", meaning: "Vínculo em candidatura: contrato público proposto, aguardando enduro.", tone: "lumen" },
   { status: "future-runtime", meaning: "Runtime futuro: isolamento técnico justificado, ainda não instanciado.", tone: "mist" },
