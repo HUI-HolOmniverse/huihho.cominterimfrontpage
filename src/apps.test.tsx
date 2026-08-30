@@ -67,6 +67,35 @@ describe("Beholder Explorer", () => {
     expect(screen.getByText(/projeção do observador/i)).toBeInTheDocument();
     expect(screen.getByText(/HOS_RESEARCH ≠ FIRST_CYCLE_CANON/i)).toBeInTheDocument();
   });
+
+  it("reduced motion: projeção permanece estática e o teclado continua operante", () => {
+    const original = window.matchMedia;
+    Object.defineProperty(window, "matchMedia", {
+      writable: true,
+      value: (q: string) => ({
+        matches: true,
+        media: q,
+        onchange: null,
+        addListener: () => {},
+        removeListener: () => {},
+        addEventListener: () => {},
+        removeEventListener: () => {},
+        dispatchEvent: () => false,
+      }),
+    });
+    render(
+      <RegistryProvider>
+        <Explorer />
+      </RegistryProvider>,
+    );
+    /* sem loop de animação, a leitura do observador nunca sai do zero */
+    expect(screen.getByText(/x 0\.00 · y 0\.00/)).toBeInTheDocument();
+    const rootList = screen.getByRole("list", { name: /Hólons de Constelação HUI/i });
+    fireEvent.keyDown(rootList, { key: "ArrowDown" });
+    fireEvent.keyDown(rootList, { key: "Enter" });
+    expect(screen.getByText(/x 0\.00 · y 0\.00/)).toBeInTheDocument();
+    Object.defineProperty(window, "matchMedia", { writable: true, value: original });
+  });
 });
 
 describe("Holo-Logoi", () => {
@@ -149,6 +178,10 @@ describe("Snapshot Diff", () => {
     const ta = screen.getByPlaceholderText(/hui\.constellation\.snapshot/);
     fireEvent.change(ta, { target: { value: payload } });
     expect(await screen.findByText(/adicionado · 1/)).toBeInTheDocument();
-    expect(document.body.textContent).not.toContain("segredo.example");
+    /* o JSON colado vive apenas no campo de entrada — nada atravessa para o resultado */
+    const resultado = screen.getByLabelText("Resultado do diff");
+    expect(resultado.textContent).not.toContain("segredo.example");
+    /* e nenhuma âncora renderizada aponta para material protegido */
+    expect(document.querySelector("a[href*='segredo']")).toBeNull();
   });
 });

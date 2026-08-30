@@ -37,8 +37,9 @@ describe("lançador", () => {
     render(<LauncherHarness />);
     const input = screen.getByLabelText(/buscar building blocks/i);
     fireEvent.change(input, { target: { value: "ICEBERG" } });
-    const first = (await screen.findAllByRole("option"))[0];
-    fireEvent.keyDown(first.querySelector("button")!, { key: "Enter" });
+    await screen.findAllByRole("option");
+    /* Enter é tratado no campo de busca — como no uso real por teclado */
+    fireEvent.keyDown(input, { key: "Enter" });
     expect(await screen.findByRole("dialog", { name: /Inspector/i })).toBeInTheDocument();
   });
 
@@ -142,5 +143,20 @@ describe("rotas", () => {
     render(<App />);
     await waitFor(() => expect(screen.getByRole("heading", { level: 1, name: /Lentes do registry/i })).toBeInTheDocument());
     expect(screen.getByLabelText(/filtrar registry/i)).toBeInTheDocument();
+  });
+
+  it("rota #/holomniverse carrega o Beholder Explorer", async () => {
+    window.location.hash = "#/holomniverse";
+    render(<App />);
+    await waitFor(
+      () => expect(screen.getByRole("heading", { level: 1, name: /Beholder Explorer/i })).toBeInTheDocument(),
+      { timeout: 6000 },
+    );
+  });
+
+  it("rota #/holo-logoi carrega o ledger de termos", async () => {
+    window.location.hash = "#/holo-logoi";
+    render(<App />);
+    await waitFor(() => expect(screen.getByLabelText(/buscar termo/i)).toBeInTheDocument(), { timeout: 6000 });
   });
 });

@@ -1,5 +1,16 @@
 /* Deterministic registry invariants — P5 */
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
+/** Raiz do projeto — robusta a partir de qualquer cwd (incl. verifier/). */
+function projectRoot(): string {
+  let dir = process.cwd();
+  for (let i = 0; i < 6; i++) {
+    if (existsSync(resolve(dir, "index.html")) && existsSync(resolve(dir, "package.json"))) return dir;
+    dir = resolve(dir, "..");
+  }
+  return process.cwd();
+}
 import { describe, expect, it } from "vitest";
 import {
   LIFECYCLE,
@@ -11,6 +22,7 @@ import {
 } from "./model";
 import { SEED_RECORDS } from "./registry";
 import { REGISTRY, REGISTRY_META, parseQuery, applyFilters, searchRecords } from "./queries";
+import { publicSafeSnapshot } from "./diff";
 
 describe("invariantes do registry", () => {
   it("ids únicos + positiveNote em todo bloco + vocabulário controlado", () => {
@@ -122,8 +134,25 @@ describe("consultas", () => {
 
 describe("proteção de publicação", () => {
   it("index.html mantém noindex,nofollow", () => {
-    const html = readFileSync(new URL("../../index.html", import.meta.url), "utf-8");
+    const html = readFileSync(resolve(projectRoot(), "index.html"), "utf-8");
     expect(html).toContain('name="robots"');
     expect(html).toContain("noindex, nofollow");
+  });
+
+  it("robots.txt mantém hold de indexação", () => {
+    const robots = readFileSync(resolve(projectRoot(), "public/robots.txt"), "utf-8");
+    expect(robots).toContain("User-agent: *");
+    expect(robots).toContain("Disallow: /");
+  });
+
+  it("export público-seguro valida limpo e nunca vaza URL restrita", () => {
+    const snap = publicSafeSnapshot(REGISTRY, { source: "teste-determinístico", generatedAt: "2026-08-30" });
+    expect(snap.schema).toBe("hui.constellation.snapshot/v1");
+    expect(validateRegistry(snap.records)).toEqual([]);
+    for (const r of snap.records) {
+      for (const s of r.sourceRefs) {
+        if (s.access !== "public") expect(s.safeUrl, `${r.id}/${s.id} vaza URL no export`).toBeUndefined();
+      }
+    }
   });
 });

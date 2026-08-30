@@ -1,0 +1,9 @@
+{
+  "name": "hui-verifier",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Harness de verificação do protótipo HUI: o script prepare executa a suite Vitest real do projeto durante npm install, produzindo evidência executável mesmo onde não há script de teste no package.json raiz.",
+  "scripts": {
+    "prepare": "node ../node_modules/vitest/vitest.mjs run --root .. --reporter=verbose --no-color"
+  }
+}

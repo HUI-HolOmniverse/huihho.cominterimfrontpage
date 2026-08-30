@@ -248,7 +248,10 @@ export function sanitizeRecord(input: Partial<BuildingBlockRecord> & { id: strin
     relatedIds: input.relatedIds,
     capabilities: input.capabilities,
     unknowns: input.unknowns,
-    positiveNote: input.positiveNote ?? "Valor de continuidade ainda não documentado — reter e reavaliar.",
+    positiveNote:
+      input.positiveNote && input.positiveNote.trim().length > 0
+        ? input.positiveNote
+        : "Valor de continuidade ainda não documentado — reter e reavaliar.",
   };
 
   /* CURRENT sem lastro exigido → desce um degrau, nunca fabrica vigência. */

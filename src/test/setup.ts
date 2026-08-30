@@ -20,4 +20,34 @@ if (typeof window !== "undefined") {
   if (!Element.prototype.scrollIntoView) {
     Element.prototype.scrollIntoView = () => {};
   }
+
+  /* IntersectionObserver — jsdom não implementa; stub marca tudo como visível */
+  if (!(globalThis as Record<string, unknown>).IntersectionObserver) {
+    class IntersectionObserverStub {
+      private cb: IntersectionObserverCallback;
+      readonly root: Element | null = null;
+      readonly rootMargin: string = "";
+      readonly thresholds: ReadonlyArray<number> = [];
+      constructor(cb: IntersectionObserverCallback) {
+        this.cb = cb;
+      }
+      observe(target: Element) {
+        queueMicrotask(() =>
+          this.cb(
+            [{ isIntersecting: true, target, intersectionRatio: 1 } as IntersectionObserverEntry],
+            this as unknown as IntersectionObserver,
+          ),
+        );
+      }
+      unobserve() {}
+      disconnect() {}
+      takeRecords(): IntersectionObserverEntry[] {
+        return [];
+      }
+    }
+    (globalThis as Record<string, unknown>).IntersectionObserver = IntersectionObserverStub;
+  }
+
+  Object.defineProperty(window, "scrollTo", { value: () => {}, writable: true, configurable: true });
+  HTMLCanvasElement.prototype.getContext = (() => null) as unknown as typeof HTMLCanvasElement.prototype.getContext;
 }
