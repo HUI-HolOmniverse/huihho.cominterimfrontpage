@@ -165,12 +165,16 @@ export function Doors() {
               delay={i * 130}
               className={i === 0 ? "lg:col-span-5 md:col-span-2" : i === 1 ? "lg:col-span-4" : "lg:col-span-3"}
             >
-              <a
-                href={href(d.path)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`group relative block h-full overflow-hidden rounded-lg border border-seam bg-gradient-to-b from-ink-850 to-ink-900 p-7 sm:p-8 transition-all duration-400 hover:-translate-y-1.5 hover:border-seam-strong ${a.glow}`}
+              <div
+                className={`group relative h-full overflow-hidden rounded-lg border border-seam bg-gradient-to-b from-ink-850 to-ink-900 p-7 sm:p-8 transition-all duration-400 hover:-translate-y-1.5 hover:border-seam-strong ${a.glow}`}
               >
+                <a
+                  href={href(d.path)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={`${d.name} — abrir em huihho.com`}
+                  className="absolute inset-0 z-[1] rounded-lg"
+                />
                 <span className={`absolute top-0 left-0 h-[3px] w-10 ${a.bar} transition-all duration-500 group-hover:w-full`} aria-hidden="true" />
                 <span className="absolute top-5 right-6 font-display text-6xl font-light text-mist-200/8 select-none" aria-hidden="true">
                   {d.n}
@@ -190,7 +194,22 @@ export function Doors() {
                     </svg>
                   </span>
                 </div>
-              </a>
+
+                {d.local && (
+                  <div className="relative z-[2] mt-6 pt-4 border-t border-seam flex items-center justify-between gap-3">
+                    <span className="font-mono text-[8px] tracking-[0.18em] uppercase text-mist-600">{d.local.label}</span>
+                    <a
+                      href={d.local.hash}
+                      className="group/local flex items-center gap-2 font-mono text-[10px] tracking-[0.16em] uppercase text-lumen-300 border border-lumen-500/45 rounded-full px-3.5 py-1.5 transition-all duration-300 hover:bg-lumen-500/10 hover:border-lumen-300 hover:shadow-[0_0_20px_rgba(62,207,178,0.25)]"
+                    >
+                      {d.local.cta}
+                      <svg viewBox="0 0 12 20" className="w-2 h-3.5 transition-transform duration-300 group-hover/local:translate-y-0.5" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+                        <path d="M6 1v16M1.5 12.5 6 17l4.5-4.5" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </a>
+                  </div>
+                )}
+              </div>
             </Reveal>
           );
         })}

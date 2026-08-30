@@ -1,11 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
+import { HashRouter, Route, Routes, useLocation } from "react-router-dom";
 import { Header, Ticker, Footer } from "./chrome";
 import { Opening, Doors, Fabric, Beholder } from "./sectionsA";
 import { CanonicalMap, Crowd, Topology, Publishing } from "./sectionsB";
 import { Constellation } from "./sectionsC";
 import { Launcher } from "./Launcher";
+import IcebergAtlas from "./IcebergAtlas";
 
-export default function App() {
+function Portal() {
   const [launcherOpen, setLauncherOpen] = useState(false);
 
   const openLauncher = useCallback(() => setLauncherOpen(true), []);
@@ -47,5 +49,26 @@ export default function App() {
 
       <Launcher open={launcherOpen} onClose={closeLauncher} />
     </div>
+  );
+}
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+}
+
+export default function App() {
+  return (
+    <HashRouter>
+      <ScrollToTop />
+      <Routes>
+        <Route path="/" element={<Portal />} />
+        <Route path="/iceberg" element={<IcebergAtlas />} />
+        <Route path="*" element={<Portal />} />
+      </Routes>
+    </HashRouter>
   );
 }

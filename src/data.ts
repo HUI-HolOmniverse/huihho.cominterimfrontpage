@@ -109,6 +109,7 @@ export interface Door {
   cta: string;
   status: EpistemicStatus;
   accent: "gild" | "lumen" | "ember";
+  local?: { label: string; cta: string; hash: string };
 }
 
 export const DOORS: Door[] = [
@@ -121,6 +122,7 @@ export const DOORS: Door[] = [
     cta: "Explorar",
     status: "ACCEPTED CODE",
     accent: "gild",
+    local: { label: "experiência local · building block", cta: "iniciar descida", hash: "#/iceberg" },
   },
   {
     n: "02",
@@ -349,10 +351,12 @@ export interface LauncherItem {
   kind: "rota" | "capacidade" | "manifestação";
   status?: string;
   external?: boolean;
+  route?: string;
 }
 
 export const LAUNCHER_ITEMS: LauncherItem[] = [
-  { id: "r-iceberg", label: "ICEBERG", hint: "/iceberg · atlas ontogônico da convergência", url: href("/iceberg"), category: "ICEBERG", kind: "rota", status: "ACCEPTED CODE", external: true },
+  { id: "x-iceberg-local", label: "ICEBERG — Atlas profundo", hint: "experiência local · descida guiada por camadas, evidência e currentness", url: "", route: "/iceberg", category: "ICEBERG", kind: "capacidade", status: "ACCEPTED CODE" },
+  { id: "r-iceberg", label: "ICEBERG · rota canônica", hint: "huihho.com/iceberg · atlas ontogônico da convergência", url: href("/iceberg"), category: "ICEBERG", kind: "rota", status: "ACCEPTED CODE", external: true },
   { id: "r-holomniverse", label: "HolOmniverse", hint: "/holomniverse · esfera navegacional Beholder-centered", url: href("/holomniverse"), category: "HUI", kind: "rota", status: "CANDIDATE", external: true },
   { id: "r-logoi", label: "Holo-Logoi", hint: "/holo-logoi · significado, proveniência e memória viva", url: href("/holo-logoi"), category: "Holo-Logoi", kind: "rota", status: "CANDIDATE", external: true },
   { id: "r-arch", label: "Arquitetura", hint: "/architecture · meta, meso, runtime e interfaces", url: href("/architecture"), category: "HUI", kind: "rota", status: "CANDIDATE", external: true },

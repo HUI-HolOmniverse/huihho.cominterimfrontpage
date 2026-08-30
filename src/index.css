@@ -124,6 +124,22 @@ body {
     opacity: 0;
   }
 }
+@keyframes kf-wave {
+  from {
+    transform: translate(0, -50%);
+  }
+  to {
+    transform: translate(-50%, -50%);
+  }
+}
+@keyframes kf-wave-rev {
+  from {
+    transform: translate(-50%, -30%);
+  }
+  to {
+    transform: translate(0, -30%);
+  }
+}
 
 /* ---------- animation utilities ---------- */
 .anim-spin-slow {
@@ -156,6 +172,12 @@ body {
 }
 .anim-float {
   animation: kf-float 7s ease-in-out infinite;
+}
+.anim-wave {
+  animation: kf-wave 16s linear infinite;
+}
+.anim-wave-rev {
+  animation: kf-wave-rev 22s linear infinite;
 }
 .pulse-ring {
   animation: kf-pulse-ring 3.2s cubic-bezier(0.2, 0.6, 0.3, 1) infinite;
@@ -236,6 +258,8 @@ body {
   .anim-dash,
   .anim-ticker,
   .anim-float,
+  .anim-wave,
+  .anim-wave-rev,
   .pulse-ring {
     animation: none !important;
   }

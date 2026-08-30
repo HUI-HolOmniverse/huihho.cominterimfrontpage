@@ -77,7 +77,11 @@ export function Launcher({ open, onClose }: { open: boolean; onClose: () => void
   if (!open) return null;
 
   const go = (it: LauncherItem) => {
-    window.open(it.url, "_blank", "noopener,noreferrer");
+    if (it.route) {
+      window.location.hash = it.route;
+    } else {
+      window.open(it.url, "_blank", "noopener,noreferrer");
+    }
     onClose();
   };
 
@@ -164,7 +168,14 @@ export function Launcher({ open, onClose }: { open: boolean; onClose: () => void
                   <span className={`block text-sm truncate ${i === active ? "text-mist-50" : "text-mist-200"}`}>{it.label}</span>
                   <span className="block font-mono text-[10px] text-mist-600 truncate mt-0.5">{it.hint}</span>
                 </span>
-                <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.14em] text-mist-600 hidden sm:block">{it.category}</span>
+                <span className="shrink-0 flex items-center gap-2">
+                  {it.route && (
+                    <span className="font-mono text-[8px] uppercase tracking-[0.16em] text-ink-950 bg-lumen-400 rounded px-1.5 py-0.5">
+                      local
+                    </span>
+                  )}
+                  <span className="font-mono text-[9px] uppercase tracking-[0.14em] text-mist-600 hidden sm:block">{it.category}</span>
+                </span>
                 <svg viewBox="0 0 16 16" className={`w-3.5 h-3.5 shrink-0 transition-all duration-200 ${i === active ? "text-lumen-400 translate-x-0.5" : "text-mist-600"}`} fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
                   <path d="M3 8h9M9 4.5 12.5 8 9 11.5" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
