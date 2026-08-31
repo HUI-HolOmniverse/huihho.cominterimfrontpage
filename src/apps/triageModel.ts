@@ -122,24 +122,28 @@ const rep = (partial: Partial<TriageItem> & { id: string }): TriageItem => {
   return { ...base, ...partial };
 };
 
+/**
+ * SYNTHETIC_DEMO_INPUT (BLOCKER 3) — itens 100% sintéticos e anônimos.
+ * Nenhuma pessoa, fonte, canal ou evento real é representado. DEMO != SOURCE · DEMO != EVIDENCE.
+ */
 export const REPRESENTATIVE_ITEMS: TriageItem[] = [
   rep({
     id: "rep-abiu",
     rawContent: "Abiu",
-    sourceType: "WHATSAPP",
+    sourceType: "MANUAL",
     contentKind: "TEXT",
-    sourceRef: "Sergio, mensagem de voz transcrita — sem contexto adicional",
-    provenanceRefs: ["conversa WhatsApp 2026-08"],
+    sourceRef: "SYNTHETIC_DEMO_INPUT · anonymous human collaboration pattern",
+    provenanceRefs: ["SYNTHETIC_DEMO_INPUT"],
     status: "IN_TRIAGE",
-    triage: { ...emptyTriageLayer(), tentativeTags: ["RESEARCH_LEAD"], thematicPointers: ["SOCIOBIOECONOMIA"], questions: ["O que Sergio quer dizer com isto? Fruta? Ponto de entrada de cadeia produtiva?"] },
+    triage: { ...emptyTriageLayer(), tentativeTags: ["RESEARCH_LEAD"], thematicPointers: ["SOCIOBIOECONOMIA"], questions: ["Trata-se de fruta, produto ou ponto de entrada de cadeia produtiva?"] },
   }),
   rep({
     id: "rep-frutas",
     rawContent: "11 frutas que o mercado de cosméticos compra pra extrair óleo",
-    sourceType: "MEETING",
+    sourceType: "MANUAL",
     contentKind: "OBSERVATION",
-    sourceRef: "fala em reunião — autoria a confirmar",
-    provenanceRefs: ["reunião de ecossistema 2026-08"],
+    sourceRef: "SYNTHETIC_DEMO_INPUT · afirmação de mercado simulada",
+    provenanceRefs: ["SYNTHETIC_DEMO_INPUT"],
     potentialCreativeContribution: true,
     triage: { ...emptyTriageLayer(), tentativeTags: ["FACT_OR_EXTERNAL_CLAIM", "RESEARCH_LEAD"], thematicPointers: ["ECONOMIAS_REGENERATIVAS", "PRODUTORES_TERRITORIOS"], questions: ["De onde vem essa afirmação de mercado?", "Há contribuição criativa atribuível aqui?"] },
   }),
@@ -149,18 +153,19 @@ export const REPRESENTATIVE_ITEMS: TriageItem[] = [
     externalUri: "https://example.org/estudo-poluinizacao-comunitaria",
     sourceType: "WEB",
     contentKind: "LINK",
-    sourceRef: "link enviado por colaboradora",
+    sourceRef: "SYNTHETIC_DEMO_INPUT · link de demonstração",
+    provenanceRefs: ["SYNTHETIC_DEMO_INPUT"],
     sensitivity: "PUBLIC_SAFE",
     triage: { ...emptyTriageLayer(), tentativeTags: ["FACT_OR_EXTERNAL_CLAIM"], thematicPointers: ["EVIDENCIAS_FONTES"], destinations: ["NEEDS_SOURCE_CHECK"] },
   }),
   rep({
     id: "rep-sensivel",
-    rawContent: "[relato interno sobre negociação territorial — não reproduzir]",
-    sourceType: "GMAIL",
+    rawContent: "[conteúdo sensível de demonstração — não reproduzir]",
+    sourceType: "MANUAL",
     contentKind: "TEXT",
     sensitivity: "SENSITIVE_PRIVATE",
-    sourceRef: "e-mail de produtor — confidencial",
-    provenanceRefs: ["caixa governada"],
+    sourceRef: "SYNTHETIC_DEMO_INPUT · item sensível simulado",
+    provenanceRefs: ["SYNTHETIC_DEMO_INPUT"],
     triage: { ...emptyTriageLayer(), tentativeTags: ["RELATIONSHIP_OR_CONTACT_SIGNAL"], thematicPointers: ["PRODUTORES_TERRITORIOS"], questions: ["Quem pode acessar este contexto?"] },
   }),
 ];
@@ -253,53 +258,89 @@ function slug(s: string) {
     .slice(0, 40);
 }
 
+export function isRepresentativeDemo(item: TriageItem): boolean {
+  return item.origin === "representative-demo";
+}
+
+/** Gate de export (BLOCKER 4): item representativo NUNCA exporta evidência/candidato-evidência. */
+export function canExportCandidate(item: TriageItem): { ok: boolean; reason: string } {
+  if (isRepresentativeDemo(item)) {
+    return { ok: false, reason: "SYNTHETIC_DEMO_NON_EVIDENCE — item representativo não exporta evidência nem candidato-evidência. DEMO != SOURCE · DEMO != EVIDENCE. Inspeção apenas como objeto de demonstração." };
+  }
+  return { ok: true, reason: "" };
+}
+
 /**
  * Constrói um CANDIDATO — objeto explícito de registry, rotulado como tal.
  * Privacidade: nada não público-seguro vira externalUrl/descrição/âncora.
+ * Representativo → objeto sintético de demonstração, NUNCA historical-record/primary (BLOCKER 3/4).
  */
 export function buildCandidateRecord(item: TriageItem): BuildingBlockRecord {
   const pub = isPublicSafe(item.sensitivity);
+  const demo = isRepresentativeDemo(item);
   const raw = item.rawContent?.trim() ?? "";
-  const title = pub && raw.length > 0 ? (raw.length > 64 ? `${raw.slice(0, 61)}…` : raw) : `Captura triada · ${item.id}`;
+  const title = demo
+    ? `Demo sintético · ${item.id}`
+    : pub && raw.length > 0
+      ? (raw.length > 64 ? `${raw.slice(0, 61)}…` : raw)
+      : `Captura triada · ${item.id}`;
   const safePointers = item.triage.thematicPointers.length > 0 ? item.triage.thematicPointers.join(", ") : "sem ponteiros";
 
   return sanitizeRecord({
-    id: `cand-${slug(title) || item.id}-${item.id.slice(-4)}`,
+    id: `${demo ? "demo" : "cand"}-${slug(title) || item.id}-${item.id.slice(-4)}`,
     canonicalName: title,
     kind: "experiment",
     family: "Registry",
-    description: pub
-      ? `Candidato oriundo de Treasure Drop triado. Bruto: ${raw || item.externalUri || "link preservado"}. Interpretação secundária: ${safePointers}. CANDIDATE ≠ CANON — nenhuma adoção ocorreu.`
-      : `Candidato oriundo de Treasure Drop triado. ${maskUnlessPublic(raw, item.sensitivity)} Interpretação secundária: ${safePointers}. CANDIDATE ≠ CANON — nenhuma adoção ocorreu.`,
+    description: demo
+      ? `SYNTHETIC_DEMO_NON_EVIDENCE — objeto de demonstração sintético e anônimo (padrão de co-criação humana · DEMO). DEMO != SOURCE · DEMO != EVIDENCE. Não é evidência, não é fonte, não exporta.`
+      : pub
+        ? `Candidato oriundo de Treasure Drop triado. Bruto: ${raw || item.externalUri || "link preservado"}. Interpretação secundária: ${safePointers}. CANDIDATE ≠ CANON — nenhuma adoção ocorreu.`
+        : `Candidato oriundo de Treasure Drop triado. ${maskUnlessPublic(raw, item.sensitivity)} Interpretação secundária: ${safePointers}. CANDIDATE ≠ CANON — nenhuma adoção ocorreu.`,
     sourceRefs: [
-      {
-        id: `cand-src-${item.id}`,
-        sourceClass: item.origin === "representative-demo" ? "historical-record" : "local-source",
-        label: pub && item.externalUri ? item.externalUri : `Treasure Drop · ${item.sourceType} · ${item.contentKind}`,
-        role: "primary",
-        access: pub ? "public" : "restricted",
-        safeUrl: pub && item.externalUri && /^https?:\/\//i.test(item.externalUri) ? item.externalUri : undefined,
-        observedAt: item.createdAt,
-        whyWeBelieveThis: `Preservado como REPORTED/QUARANTINED; triagem secundária registrada sem alterar a fonte bruta.`,
-      },
+      demo
+        ? {
+            id: `demo-src-${item.id}`,
+            /* explicitamente NÃO-evidência: nunca historical-record, nunca primary (BLOCKER 3) */
+            sourceClass: "local-source",
+            label: "SYNTHETIC_DEMO_INPUT · anonymous human collaboration pattern",
+            role: "synthesis",
+            access: "public",
+            observedAt: item.createdAt,
+            whyWeBelieveThis: "Objeto sintético de demonstração — deliberadamente sem valor de evidência (DEMO != EVIDENCE).",
+          }
+        : {
+            id: `cand-src-${item.id}`,
+            sourceClass: "local-source",
+            label: pub && item.externalUri ? item.externalUri : `Treasure Drop · ${item.sourceType} · ${item.contentKind}`,
+            role: "primary",
+            access: pub ? "public" : "restricted",
+            safeUrl: pub && item.externalUri && /^https?:\/\//i.test(item.externalUri) ? item.externalUri : undefined,
+            observedAt: item.createdAt,
+            whyWeBelieveThis: `Preservado como REPORTED/QUARANTINED; triagem secundária registrada sem alterar a fonte bruta.`,
+          },
     ],
     lifecycle: "DRAFT_PROPOSAL",
     currentness: "unknown",
-    evidence: { rung: 0, basis: "REPORTED via Treasure Drop — sem verificação; base da crença documentada na triagem." },
-    visibility: pub ? "public" : "metadata-only",
-    publicability: pub ? "public-safe" : "metadata-only",
-    externalUrl: pub && item.externalUri && /^https?:\/\//i.test(item.externalUri) ? item.externalUri : undefined,
-    unknowns: [
-      ...(item.triage.questions.length > 0 ? item.triage.questions : ["Perguntas de triagem não registradas"]),
-      "AIPFIT: REGISTRATION_NOT_REQUESTED (padrão)",
-    ],
-    positiveNote: `Preserva voz, cronologia e proveniência da descoberta humana — material fértil para o Snapshot Diff e o Intake Studio quando a estrutura fizer sentido.`,
+    evidence: { rung: 0, basis: demo ? "SYNTHETIC_DEMO_NON_EVIDENCE — sem valor de evidência por desenho." : "REPORTED via Treasure Drop — sem verificação; base da crença documentada na triagem." },
+    visibility: demo ? "public" : pub ? "public" : "metadata-only",
+    publicability: demo ? "public-safe" : pub ? "public-safe" : "metadata-only",
+    externalUrl: !demo && pub && item.externalUri && /^https?:\/\//i.test(item.externalUri) ? item.externalUri : undefined,
+    unknowns: demo
+      ? ["SYNTHETIC_DEMO_NON_EVIDENCE", "DEMO != SOURCE", "DEMO != EVIDENCE"]
+      : [
+          ...(item.triage.questions.length > 0 ? item.triage.questions : ["Perguntas de triagem não registradas"]),
+          "AIPFIT: REGISTRATION_NOT_REQUESTED (padrão)",
+        ],
+    positiveNote: demo
+      ? "Padrão de co-criação humana demonstrado de forma anônima e sintética — útil para exercitar a triagem sem expor pessoa, fonte ou canal real."
+      : `Preserva voz, cronologia e proveniência da descoberta humana — material fértil para o Snapshot Diff e o Intake Studio quando a estrutura fizer sentido.`,
   });
 }
 
 /* ---------------- handoffs ---------------- */
 
 export function handoffCandidateToDiff(item: TriageItem) {
+  if (!canExportCandidate(item).ok) return; /* representativo nunca exporta evidência (BLOCKER 4) */
   const rec = buildCandidateRecord(item);
   const frag = publicSafeSnapshot([rec], { source: "triage-workbench · candidato", generatedAt: new Date().toISOString().slice(0, 10) });
   try {
@@ -312,6 +353,7 @@ export function handoffCandidateToDiff(item: TriageItem) {
 }
 
 export function handoffCandidateToIntake(item: TriageItem) {
+  if (!canExportCandidate(item).ok) return; /* representativo nunca exporta candidato-evidência (BLOCKER 4) */
   const rec = buildCandidateRecord(item);
   const pub = isPublicSafe(item.sensitivity);
   try {

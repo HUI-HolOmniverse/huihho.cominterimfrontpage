@@ -10,6 +10,7 @@ import {
   READBACK_STATES,
   READBACK_TONE,
   TRANSITIONS,
+  canExportEvidence,
   canTransition,
   exportEvidenceCandidate,
   handoffEvidenceToDiff,
@@ -17,6 +18,8 @@ import {
   newReadbackId,
   readbacksForTarget,
   saveReadbacks,
+  validCorroborations,
+  type Corroboration,
   type ReadbackRecord,
   type ReadbackState,
 } from "./readbackModel";
@@ -55,6 +58,12 @@ export default function ReadbackConsole() {
   const [pointers, setPointers] = useState("");
   const [interpretation, setInterpretation] = useState("");
   const [formError, setFormError] = useState("");
+
+  /* corroboração estruturada (BLOCKER 1) */
+  const [corrActor, setCorrActor] = useState("");
+  const [corrSource, setCorrSource] = useState("");
+  const [corrPointer, setCorrPointer] = useState("");
+  const [corrError, setCorrError] = useState("");
 
   /* alvo pré-carregado via handoff */
   useEffect(() => {
@@ -119,6 +128,28 @@ export default function ReadbackConsole() {
     const next = saveReadbacks(readbacks.map((x) => (x.id === r.id ? { ...x, state: to, contradictionFlag: to === "CONTRADICTED" ? true : x.contradictionFlag } : x)));
     setReadbacks(next);
     setNotice(`Estado movido para ${READBACK_LABEL[to]} com transição legítima registrada.`);
+  };
+
+  const addCorroboration = (r: ReadbackRecord) => {
+    const actor = corrActor.trim();
+    const src = corrSource.trim();
+    const ev = corrPointer.trim();
+    if (!actor || !src || !ev) {
+      setCorrError("Corroboração exige ator, fonte distinta e ponteiro de evidência.");
+      return;
+    }
+    if (r.sourceRef && r.sourceRef.trim() && src === r.sourceRef.trim()) {
+      setCorrError("A fonte da corroboração não pode repetir o localizador da fonte original.");
+      return;
+    }
+    const c: Corroboration = { actor, sourceRef: src, evidencePointer: ev, observedAt: new Date().toISOString().slice(0, 10) };
+    const next = saveReadbacks(readbacks.map((x) => (x.id === r.id ? { ...x, corroborations: [...(x.corroborations ?? []), c] } : x)));
+    setReadbacks(next);
+    setCorrError("");
+    setCorrActor("");
+    setCorrSource("");
+    setCorrPointer("");
+    setNotice("Corroboração registrada — habilita CORROBORATED/VERIFIED se os demais requisitos forem atendidos.");
   };
 
   return (
@@ -321,9 +352,50 @@ export default function ReadbackConsole() {
                 </div>
               </div>
 
+              {/* corroboração estruturada (BLOCKER 1) */}
+              <div className="mt-5 border-t border-seam pt-4">
+                <div className="flex flex-wrap items-center justify-between gap-2 mb-2.5">
+                  <p className="font-mono text-[9px] tracking-[0.22em] uppercase text-mist-600">corroborações · {validCorroborations(selected).length} válida(s)</p>
+                  <span className="font-mono text-[8px] uppercase tracking-[0.14em] text-mist-600">exigida p/ CORROBORATED e VERIFIED</span>
+                </div>
+                {selected.corroborations && selected.corroborations.length > 0 && (
+                  <ul className="space-y-1.5 mb-3">
+                    {selected.corroborations.map((c, i) => (
+                      <li key={i} className="text-[12px] text-mist-400 leading-relaxed rounded-md border border-seam bg-ink-950/60 px-3.5 py-2.5">
+                        <span className="text-mist-200">{c.actor}</span> · fonte: <span className="break-all">{c.sourceRef}</span> · evidência: {c.evidencePointer} <span className="text-mist-600">({c.observedAt})</span>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+                <div className="grid sm:grid-cols-3 gap-2.5">
+                  <label className="block">
+                    <span className="block font-mono text-[8px] tracking-[0.18em] uppercase text-mist-600 mb-1">ator corroborador</span>
+                    <input value={corrActor} onChange={(e) => setCorrActor(e.target.value)} placeholder="quem corrobora" className={inputCls} aria-label="Ator corroborador" />
+                  </label>
+                  <label className="block">
+                    <span className="block font-mono text-[8px] tracking-[0.18em] uppercase text-mist-600 mb-1">fonte distinta</span>
+                    <input value={corrSource} onChange={(e) => setCorrSource(e.target.value)} placeholder="fonte da corroboração" className={inputCls} aria-label="Fonte da corroboração" />
+                  </label>
+                  <label className="block">
+                    <span className="block font-mono text-[8px] tracking-[0.18em] uppercase text-mist-600 mb-1">ponteiro de evidência</span>
+                    <input value={corrPointer} onChange={(e) => setCorrPointer(e.target.value)} placeholder="log, link, ata…" className={inputCls} aria-label="Ponteiro de evidência da corroboração" />
+                  </label>
+                </div>
+                {corrError && <p role="alert" className="mt-2 text-[11.5px] text-ember-300">{corrError}</p>}
+                <button onClick={() => addCorroboration(selected)} className="mt-2.5 px-4 py-2 rounded-md border border-lumen-500/45 text-lumen-300 font-mono text-[9px] uppercase tracking-[0.16em] hover:bg-lumen-500/10 transition-colors cursor-pointer focus-ring">
+                  + registrar corroboração
+                </button>
+              </div>
+
               {/* ações */}
               <div className="mt-5 grid sm:grid-cols-3 gap-2">
-                <button onClick={() => handoffEvidenceToDiff(selected)} className="px-4 py-2.5 rounded-md border border-lumen-500/50 text-lumen-300 font-mono text-[10px] uppercase tracking-[0.14em] hover:bg-lumen-500/10 transition-colors cursor-pointer focus-ring">
+                <button
+                  onClick={() => handoffEvidenceToDiff(selected)}
+                  disabled={!canExportEvidence(selected).ok}
+                  title={canExportEvidence(selected).ok ? "exportar EVIDENCE_CANDIDATE ao Snapshot Diff" : canExportEvidence(selected).reason}
+                  aria-label={`exportar EVIDENCE_CANDIDATE ao Snapshot Diff${canExportEvidence(selected).ok ? "" : " — bloqueado: " + canExportEvidence(selected).reason}`}
+                  className="px-4 py-2.5 rounded-md border border-lumen-500/50 text-lumen-300 font-mono text-[10px] uppercase tracking-[0.14em] hover:bg-lumen-500/10 transition-colors cursor-pointer focus-ring disabled:opacity-45 disabled:cursor-not-allowed"
+                >
                   EVIDENCE_CANDIDATE → Snapshot Diff
                 </button>
                 <button onClick={() => focusLineageNode(selected.targetId)} className="px-4 py-2.5 rounded-md border border-gild-400/50 text-gild-300 font-mono text-[10px] uppercase tracking-[0.14em] hover:bg-gild-400/10 transition-colors cursor-pointer focus-ring">
@@ -335,8 +407,13 @@ export default function ReadbackConsole() {
                   </button>
                 )}
               </div>
+              {!canExportEvidence(selected).ok && (
+                <p role="status" className="mt-2 text-[11px] text-ember-300/90 leading-relaxed">{canExportEvidence(selected).reason}</p>
+              )}
               <p className="mt-4 font-mono text-[9.5px] text-mist-600">
-                export pré-visualização: {exportEvidenceCandidate(selected).records[0]?.lifecycle ?? "—"} · AIPFIT: REGISTRATION_NOT_REQUESTED
+                {canExportEvidence(selected).ok
+                  ? `export pré-visualização: ${exportEvidenceCandidate(selected).records[0]?.lifecycle ?? "—"} · AIPFIT: REGISTRATION_NOT_REQUESTED`
+                  : "export bloqueado (SYNTHETIC_DEMO_NON_EVIDENCE) · AIPFIT: REGISTRATION_NOT_REQUESTED"}
               </p>
             </article>
           )}

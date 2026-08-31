@@ -42,6 +42,13 @@ export const TRANSITIONS: Record<ReadbackState, ReadbackState[]> = {
   UNRESOLVED: ["REPORTED", "OBSERVED"],
 };
 
+export interface Corroboration {
+  actor: string;
+  sourceRef: string;
+  evidencePointer: string;
+  observedAt: string;
+}
+
 export interface ReadbackRecord {
   id: string;
   targetId: string;
@@ -53,11 +60,47 @@ export interface ReadbackRecord {
   rawObservation: string;
   evidencePointers: string[];
   interpretation: string;
+  /** Corroborações estruturadas — obrigatórias p/ CORROBORATED e VERIFIED. */
+  corroborations?: Corroboration[];
   state: ReadbackState;
   contradictionFlag: boolean;
   notes?: string;
   representative?: boolean;
   createdAt: string;
+}
+
+/* ---------------- corroboração estruturada (BLOCKER 1) ---------------- */
+
+/**
+ * Corroboração válida = ator + fonte + ponteiro de evidência presentes.
+ * Quando a fonte original é conhecida, a corroboração NÃO pode repetir o mesmo
+ * localizador de fonte — corroborar exige uma fonte distinta.
+ */
+export function validCorroborations(r: ReadbackRecord): Corroboration[] {
+  const list = r.corroborations ?? [];
+  const knownSource = (r.sourceRef ?? "").trim();
+  return list.filter((c) => {
+    if (!c || typeof c !== "object") return false;
+    const actor = (c.actor ?? "").trim();
+    const src = (c.sourceRef ?? "").trim();
+    const ev = (c.evidencePointer ?? "").trim();
+    if (actor.length === 0 || src.length === 0 || ev.length === 0) return false;
+    if (knownSource.length > 0 && src === knownSource) return false; /* repete a fonte — não corrobora */
+    return true;
+  });
+}
+
+const STATE_INDEX: Record<ReadbackState, number> = { OBSERVED: 0, REPORTED: 1, CORROBORATED: 2, VERIFIED: 3, CONTRADICTED: -1, UNRESOLVED: -1 };
+const MATURITY_TO_STATE: Record<number, ReadbackState> = { 0: "OBSERVED", 1: "REPORTED", 2: "CORROBORATED", 3: "VERIFIED" };
+
+/** Maturidade máxima suportada pela evidência: 0=OBSERVED 1=REPORTED 2=CORROBORATED 3=VERIFIED. */
+export function evidenceMaturity(r: ReadbackRecord): number {
+  const hasInitial = r.evidencePointers.length > 0;
+  const hasCorrob = validCorroborations(r).length > 0;
+  const hasInterp = r.interpretation.trim().length >= 10;
+  if (hasInitial && hasCorrob && hasInterp) return 3;
+  if (hasInitial && hasCorrob) return 2;
+  return 1;
 }
 
 /* ---------------- guarda de transição: nenhuma promoção silenciosa ---------------- */
@@ -70,15 +113,30 @@ export function canTransition(r: ReadbackRecord, to: ReadbackState): { ok: boole
       reason: `Transição ${r.state} → ${to} fora da máquina. Destinos legítimos a partir de ${r.state}: ${allowed.map((s) => READBACK_LABEL[s]).join(", ")}.`,
     };
   }
-  if (to === "VERIFIED") {
+  /* Registro sintético/representativo NUNCA alcança CORROBORATED ou VERIFIED. */
+  if (r.representative && (to === "CORROBORATED" || to === "VERIFIED")) {
+    return { ok: false, reason: "SYNTHETIC_DEMO_NON_EVIDENCE — registro representativo nunca é corroborado nem verificado (DEMO != EVIDENCE)." };
+  }
+  if (to === "CORROBORATED") {
     if (r.evidencePointers.length === 0) {
-      return { ok: false, reason: "VERIFIED exige ao menos um ponteiro de evidência — promoção silenciosa bloqueada." };
+      return { ok: false, reason: "CORROBORATED exige ao menos um ponteiro de evidência inicial." };
     }
+    if (validCorroborations(r).length === 0) {
+      return { ok: false, reason: "CORROBORATED exige ao menos uma corroboração válida (ator + fonte distinta + ponteiro de evidência)." };
+    }
+  }
+  if (to === "VERIFIED") {
     if (r.state !== "CORROBORATED") {
       return { ok: false, reason: "VERIFIED exige corroboração prévia (somente a partir de CORROBORATED)." };
     }
+    if (r.evidencePointers.length === 0) {
+      return { ok: false, reason: "VERIFIED exige ao menos um ponteiro de evidência inicial." };
+    }
+    if (validCorroborations(r).length === 0) {
+      return { ok: false, reason: "VERIFIED exige corroboração válida (ator + fonte distinta + ponteiro de evidência)." };
+    }
     if (r.interpretation.trim().length < 10) {
-      return { ok: false, reason: "VERIFIED exige interpretação registrada (mínimo 10 caracteres)." };
+      return { ok: false, reason: "VERIFIED exige interpretação substantiva registrada (mínimo 10 caracteres)." };
     }
   }
   return { ok: true, reason: "" };
@@ -121,7 +179,7 @@ export const SEED_READBACKS: ReadbackRecord[] = [
     id: "rb-demo-castanhas",
     targetId: "iceberg-root",
     targetLabel: "ICEBERG",
-    observer: "Padrão de diálogo (DEMO)",
+    observer: "Padrão de co-criação humana · DEMO",
     observedAt: "2026-08-31",
     sourceIsPublic: false,
     rawObservation: "[REPRESENTATIVO] Observação de mercado sobre castanhas — origem e autoria a verificar.",
@@ -130,7 +188,7 @@ export const SEED_READBACKS: ReadbackRecord[] = [
     state: "UNRESOLVED",
     contradictionFlag: false,
     representative: true,
-    notes: "DEMO rotulado — nenhum dado real de Sérgio “Da Floresta” foi anexado; nenhuma fala inventada.",
+    notes: "SYNTHETIC_DEMO_INPUT — dado sintético e anônimo; nenhuma pessoa, fonte ou canal real representado; nenhuma fala inventada.",
     createdAt: "2026-08-31",
   },
 ];
@@ -139,12 +197,39 @@ export const SEED_READBACKS: ReadbackRecord[] = [
 
 const STORE_KEY = "hui.readback.local.v1";
 
+/**
+ * Fail-closed (BLOCKER 2): um registro persistido alegando CORROBORATED/VERIFIED
+ * sem a evidência exigida é rebaixado ao estado verdadeiro mais alto suportado.
+ * Nunca preserva VERIFIED/CORROBORATED forjado e jamais promove um registro.
+ */
+export function downgradeToTruthful(r: ReadbackRecord): ReadbackRecord {
+  const base: ReadbackRecord = {
+    ...r,
+    evidencePointers: Array.isArray(r.evidencePointers) ? r.evidencePointers : [],
+    corroborations: Array.isArray(r.corroborations) ? r.corroborations : [],
+    interpretation: typeof r.interpretation === "string" ? r.interpretation : "",
+  };
+  const claimed = STATE_INDEX[base.state];
+  /* Estados-ramo e estados sem alegação de maturidade são preservados. */
+  if (claimed < 2) return base;
+  let supported = evidenceMaturity(base);
+  if (base.representative) supported = Math.min(supported, 1); /* representativo nunca ≥ CORROBORATED */
+  const target = Math.min(claimed, supported); /* só rebaixa, nunca promove */
+  if (target === claimed) return base;
+  const truthful = MATURITY_TO_STATE[target];
+  return {
+    ...base,
+    state: truthful,
+    notes: `${base.notes ? base.notes + " · " : ""}Rebaixado de ${base.state} para ${truthful} na carga (fail-closed): evidência/corroboração insuficiente.`,
+  };
+}
+
 export function loadReadbacks(): ReadbackRecord[] {
   try {
     const raw = localStorage.getItem(STORE_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as unknown;
-      if (Array.isArray(parsed)) return parsed as ReadbackRecord[];
+      if (Array.isArray(parsed)) return (parsed as ReadbackRecord[]).map(downgradeToTruthful);
     }
   } catch {
     /* fallback para sementes */
@@ -178,7 +263,17 @@ export interface EvidenceFragment {
   records: BuildingBlockRecord[];
 }
 
+/** Gate de export (BLOCKER 4): registro representativo NUNCA exporta evidência. */
+export function canExportEvidence(rb: ReadbackRecord): { ok: boolean; reason: string } {
+  if (rb.representative) {
+    return { ok: false, reason: "SYNTHETIC_DEMO_NON_EVIDENCE — registro representativo não exporta evidência. DEMO != SOURCE · DEMO != EVIDENCE. Inspeção apenas como objeto de demonstração." };
+  }
+  return { ok: true, reason: "" };
+}
+
 export function exportEvidenceCandidate(rb: ReadbackRecord): EvidenceFragment {
+  const gate = canExportEvidence(rb);
+  if (!gate.ok) throw new Error(gate.reason);
   const safeUrl = rb.sourceIsPublic && rb.sourceRef && /^https?:\/\//i.test(rb.sourceRef) ? rb.sourceRef : undefined;
   const rec = sanitizeRecord({
     id: `evcand-${rb.id}`,
@@ -189,7 +284,8 @@ export function exportEvidenceCandidate(rb: ReadbackRecord): EvidenceFragment {
     sourceRefs: [
       {
         id: `evcand-src-${rb.id}`,
-        sourceClass: rb.representative ? "historical-record" : "local-source",
+        /* nunca historical-record: apenas readback real (não-demo) exporta, como fonte local */
+        sourceClass: "local-source",
         label: rb.sourceIsPublic && rb.sourceRef ? rb.sourceRef : `readback · ${rb.observer}`,
         role: "primary",
         access: rb.sourceIsPublic ? "public" : "restricted",
@@ -214,6 +310,7 @@ export function exportEvidenceCandidate(rb: ReadbackRecord): EvidenceFragment {
 }
 
 export function handoffEvidenceToDiff(rb: ReadbackRecord) {
+  if (!canExportEvidence(rb).ok) return; /* representativo nunca exporta */
   try {
     sessionStorage.setItem(FRAGMENT_KEY, JSON.stringify(exportEvidenceCandidate(rb)));
     sessionStorage.setItem(LENS_FOCUS_KEY, "snapshot");

@@ -19,8 +19,10 @@ import {
   TRIAGE_STATUS_LABEL,
   UNCLASSIFIED_VALUES,
   buildCandidateRecord,
+  canExportCandidate,
   handoffCandidateToDiff,
   handoffCandidateToIntake,
+  isRepresentativeDemo,
   type TriageItem,
   type TriageStatus,
   type TentativeTag,
@@ -422,14 +424,36 @@ export default function TriageWorkbench() {
                     ))}
                   </div>
 
+                  {isRepresentativeDemo(selected) && (
+                    <p role="status" className="mt-5 rounded-md border border-ember-400/40 bg-ember-400/6 px-4 py-3 text-[12px] text-ember-300/90 leading-relaxed">
+                      Item representativo (SYNTHETIC_DEMO_INPUT) — export de evidência desabilitado. DEMO != SOURCE · DEMO != EVIDENCE. Disponível apenas para inspeção como objeto de demonstração.
+                    </p>
+                  )}
+
                   <div className="grid sm:grid-cols-2 gap-3 mt-6">
-                    <button onClick={() => handoffCandidateToDiff(selected)} className="group px-5 py-4 rounded-lg border border-lumen-500/45 text-left transition-all duration-200 hover:bg-lumen-500/8 hover:-translate-y-0.5 cursor-pointer focus-ring">
+                    <button
+                      onClick={() => handoffCandidateToDiff(selected)}
+                      disabled={!canExportCandidate(selected).ok}
+                      title={canExportCandidate(selected).ok ? "candidato como fragmento snapshot/v1" : canExportCandidate(selected).reason}
+                      aria-label={`abrir no Snapshot Diff${canExportCandidate(selected).ok ? "" : " — bloqueado: " + canExportCandidate(selected).reason}`}
+                      className="group px-5 py-4 rounded-lg border border-lumen-500/45 text-left transition-all duration-200 hover:bg-lumen-500/8 hover:-translate-y-0.5 cursor-pointer focus-ring disabled:opacity-45 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:translate-y-0"
+                    >
                       <span className="block font-mono text-[10px] tracking-[0.18em] uppercase text-lumen-300">abrir no Snapshot Diff</span>
-                      <span className="block text-[12px] text-mist-500 mt-1.5">candidato como fragmento snapshot/v1 · diff contra a base</span>
+                      <span className="block text-[12px] text-mist-500 mt-1.5">
+                        {canExportCandidate(selected).ok ? "candidato como fragmento snapshot/v1 · diff contra a base" : "bloqueado — SYNTHETIC_DEMO_NON_EVIDENCE · DEMO != EVIDENCE"}
+                      </span>
                     </button>
-                    <button onClick={() => handoffCandidateToIntake(selected)} className="group px-5 py-4 rounded-lg border border-gild-400/45 text-left transition-all duration-200 hover:bg-gild-400/8 hover:-translate-y-0.5 cursor-pointer focus-ring">
+                    <button
+                      onClick={() => handoffCandidateToIntake(selected)}
+                      disabled={!canExportCandidate(selected).ok}
+                      title={canExportCandidate(selected).ok ? "pré-preenche rascunho governado" : canExportCandidate(selected).reason}
+                      aria-label={`desenvolver no Intake Studio${canExportCandidate(selected).ok ? "" : " — bloqueado: " + canExportCandidate(selected).reason}`}
+                      className="group px-5 py-4 rounded-lg border border-gild-400/45 text-left transition-all duration-200 hover:bg-gild-400/8 hover:-translate-y-0.5 cursor-pointer focus-ring disabled:opacity-45 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:translate-y-0"
+                    >
                       <span className="block font-mono text-[10px] tracking-[0.18em] uppercase text-gild-300">desenvolver no Intake Studio</span>
-                      <span className="block text-[12px] text-mist-500 mt-1.5">pré-preenche rascunho governado · rascunho ≠ adoção</span>
+                      <span className="block text-[12px] text-mist-500 mt-1.5">
+                        {canExportCandidate(selected).ok ? "pré-preenche rascunho governado · rascunho ≠ adoção" : "bloqueado — SYNTHETIC_DEMO_NON_EVIDENCE · DEMO != SOURCE"}
+                      </span>
                     </button>
                     <button
                       onClick={() => inspect(buildCandidateRecord(selected))}

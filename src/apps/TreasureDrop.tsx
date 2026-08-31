@@ -9,6 +9,7 @@ import { Reveal, Scramble } from "../motion";
 import { SAFE_REL } from "../registry/model";
 import {
   CONTENT_KINDS,
+  InvalidGatewayReceiptError,
   LOCAL_DROP_STATUS_LABEL,
   SENSITIVITY,
   SENSITIVITY_LABEL,
@@ -159,11 +160,13 @@ export default function TreasureDrop() {
       resetForm();
     } catch (err) {
       const msg =
-        err instanceof GatewayAuthError
-          ? err.message
-          : err instanceof GatewayRejectedError
+        err instanceof InvalidGatewayReceiptError
+          ? "Recibo do gateway inválido ou mais maduro que o contrato — rejeitado (INVALID_GATEWAY_RECEIPT). Nenhum aceite registrado; rascunho preservado como NÃO RECEBIDO."
+          : err instanceof GatewayAuthError
             ? err.message
-            : "Falha inesperada ao submeter — rascunho preservado.";
+            : err instanceof GatewayRejectedError
+              ? err.message
+              : "Falha inesperada ao submeter — rascunho preservado.";
       setDrops(upsertLocalDrop({ ...base, status: "FAILED_TO_SUBMIT", failure: msg, updatedAt: new Date().toISOString() }));
       setBanner({ tone: "err", msg: `${msg} A mesma idempotency_key será reutilizada no retry — sem duplicatas.` });
     } finally {
@@ -181,7 +184,14 @@ export default function TreasureDrop() {
       setDrops(upsertLocalDrop({ ...item, status: "RECEIVED_BY_GATEWAY", receipt, updatedAt: new Date().toISOString() }));
       setBanner({ tone: "ok", msg: `Retry recebido (mesma idempotency_key) — ${receipt.triage_status}.` });
     } catch (err) {
-      const msg = err instanceof GatewayAuthError ? err.message : err instanceof GatewayRejectedError ? err.message : "Retry falhou — rascunho preservado.";
+      const msg =
+        err instanceof InvalidGatewayReceiptError
+          ? "Recibo do gateway inválido ou mais maduro que o contrato — rejeitado (INVALID_GATEWAY_RECEIPT). Nenhum aceite registrado; rascunho preservado como NÃO RECEBIDO."
+          : err instanceof GatewayAuthError
+            ? err.message
+            : err instanceof GatewayRejectedError
+              ? err.message
+              : "Retry falhou — rascunho preservado.";
       setDrops(upsertLocalDrop({ ...item, status: "FAILED_TO_SUBMIT", failure: msg, updatedAt: new Date().toISOString() }));
       setBanner({ tone: "err", msg });
     } finally {

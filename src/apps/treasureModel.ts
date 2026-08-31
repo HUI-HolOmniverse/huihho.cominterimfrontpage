@@ -87,18 +87,56 @@ export interface GatewayReceipt {
   created_at?: string;
 }
 
-/** Whitelist estrita — o cliente nunca relê estados fora do contrato. */
+/** Recibo malformado/mais-maduro do gateway — nunca aceito silenciosamente. */
+export class InvalidGatewayReceiptError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "INVALID_GATEWAY_RECEIPT";
+  }
+}
+
+const str = (v: unknown): string | null => (typeof v === "string" && v.trim().length > 0 ? v.trim() : null);
+
+/**
+ * Fail-closed (BLOCKER: GATEWAY RECEIPT) — um recibo "de sucesso" malformado é
+ * REJEITADO, nunca preenchido com defaults maduros. Exige valores exatos do
+ * contrato; qualquer ausência, malformação ou estado mais maduro lança
+ * INVALID_GATEWAY_RECEIPT.
+ */
 export function normalizeReceipt(raw: unknown): GatewayReceipt {
   const r = (raw ?? {}) as Record<string, unknown>;
-  const s = (v: unknown, fb: string) => (typeof v === "string" && v.trim() ? v.trim() : fb);
+
+  const id = str(r.id);
+  if (!id) throw new InvalidGatewayReceiptError("Recibo sem id válido — rejeitado (INVALID_GATEWAY_RECEIPT).");
+
+  const checks: Array<[keyof GatewayReceipt, string, string]> = [
+    ["evidence_state", str(r.evidence_state) ?? "", BACKEND_IMPOSED.evidence_state],
+    ["authority_state", str(r.authority_state) ?? "", BACKEND_IMPOSED.authority_state],
+    ["triage_status", str(r.triage_status) ?? "", BACKEND_IMPOSED.triage_status],
+    ["adoption_state", str(r.adoption_state) ?? "", BACKEND_IMPOSED.adoption_state],
+    ["aipfit_registration_state", str(r.aipfit_registration_state) ?? "", BACKEND_IMPOSED.aipfit_registration_state],
+  ];
+  for (const [field, got, want] of checks) {
+    if (got !== want) {
+      throw new InvalidGatewayReceiptError(
+        `Recibo com ${field}="${got || "<ausente>"}" — esperado exatamente "${want}". Rejeitado (INVALID_GATEWAY_RECEIPT); nada foi aceito.`,
+      );
+    }
+  }
+
+  const sensitivity = str(r.sensitivity) ?? "";
+  if (!(SENSITIVITY as readonly string[]).includes(sensitivity)) {
+    throw new InvalidGatewayReceiptError(`Recibo com sensitivity="${sensitivity || "<ausente>"}" fora do vocabulário controlado. Rejeitado (INVALID_GATEWAY_RECEIPT).`);
+  }
+
   return {
-    id: s(r.id, "desconhecido"),
-    evidence_state: s(r.evidence_state, BACKEND_IMPOSED.evidence_state),
-    authority_state: s(r.authority_state, BACKEND_IMPOSED.authority_state),
-    triage_status: s(r.triage_status, BACKEND_IMPOSED.triage_status),
-    adoption_state: s(r.adoption_state, BACKEND_IMPOSED.adoption_state),
-    aipfit_registration_state: s(r.aipfit_registration_state, BACKEND_IMPOSED.aipfit_registration_state),
-    sensitivity: s(r.sensitivity, "PUBLIC_SAFE"),
+    id,
+    evidence_state: BACKEND_IMPOSED.evidence_state,
+    authority_state: BACKEND_IMPOSED.authority_state,
+    triage_status: BACKEND_IMPOSED.triage_status,
+    adoption_state: BACKEND_IMPOSED.adoption_state,
+    aipfit_registration_state: BACKEND_IMPOSED.aipfit_registration_state,
+    sensitivity,
     created_at: typeof r.created_at === "string" ? r.created_at : undefined,
   };
 }
