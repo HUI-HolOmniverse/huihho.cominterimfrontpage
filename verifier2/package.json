@@ -1,0 +1,9 @@
+{
+  "name": "hui-verifier-run2",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Execução 2 da suite Vitest real do projeto durante npm install (mesmo comando do hui-verifier).",
+  "scripts": {
+    "prepare": "node ../node_modules/vitest/vitest.mjs run --root .. --reporter=verbose --no-color"
+  }
+}

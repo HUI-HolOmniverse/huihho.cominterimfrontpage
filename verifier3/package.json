@@ -1,0 +1,9 @@
+{
+  "name": "hui-verifier-run3",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Execução final da suite Vitest real do projeto durante npm install (pós-correção do timer leak de Scramble).",
+  "scripts": {
+    "prepare": "node ../node_modules/vitest/vitest.mjs run --root .. --reporter=verbose --no-color"
+  }
+}

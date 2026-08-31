@@ -1,0 +1,9 @@
+{
+  "name": "hui-verifier-run6",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Execução final da suite Vitest completa ( Treasure Drop + Triage + anteriores ) com log em verifier6/vitest-run.log.",
+  "scripts": {
+    "prepare": "node ../node_modules/vitest/vitest.mjs run --root .. --reporter=verbose --no-color > vitest-run.log 2>&1 || { tail -n 60 vitest-run.log; exit 1; }"
+  }
+}
