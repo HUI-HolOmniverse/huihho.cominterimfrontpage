@@ -97,6 +97,17 @@ export function Header({ onLaunch }: { onLaunch: () => void }) {
         </nav>
 
         <div className="ml-auto flex items-center gap-3 sm:gap-4">
+          <a
+            href="#/captura"
+            className="group/cap flex items-center gap-2 px-3 py-2 rounded-lg border border-gild-400/50 text-gild-300 font-mono text-[10px] tracking-[0.14em] uppercase transition-all duration-200 hover:bg-gild-400/10 hover:shadow-[0_0_22px_rgba(217,166,63,0.18)] focus-ring"
+            aria-label="Captura Rápida — Treasure Drop"
+          >
+            <svg viewBox="0 0 20 20" className="w-3.5 h-3.5 transition-transform duration-300 group-hover/cap:translate-y-0.5" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
+              <path d="M10 3v10M5.5 9 10 13.5 14.5 9" strokeLinecap="round" strokeLinejoin="round" />
+              <path d="M3.5 16.5h13" strokeLinecap="round" />
+            </svg>
+            <span className="hidden md:inline">capturar</span>
+          </a>
           <span className="hidden sm:flex items-center gap-2 font-mono text-[9px] tracking-[0.22em] uppercase text-mist-500">
             <span className="w-1.5 h-1.5 rounded-full bg-lumen-400 anim-led" aria-hidden="true" />
             public prototype · building

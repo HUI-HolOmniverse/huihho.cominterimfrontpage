@@ -21,6 +21,8 @@
     "hui-verifier": "file:verifier",
     "hui-verifier-run3": "file:verifier3",
     "hui-verifier-run4": "file:verifier4",
+    "hui-verifier-run6": "file:verifier6",
+    "hui-verifier-run7": "file:verifier7",
     "jsdom": "^30.0.1",
     "lucide-react": "^0.294.0",
     "react": "^18.2.0",

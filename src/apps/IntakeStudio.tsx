@@ -28,6 +28,7 @@ import {
   handoffToDiff,
   loadDrafts,
   newId,
+  readPrefill,
   removeDraft,
   upsertDraft,
   validateDraft,
@@ -70,6 +71,24 @@ export default function IntakeStudio() {
     }, 400);
     return () => window.clearTimeout(t);
   }, [draft]);
+
+  /* prefill one-shot (ex.: candidato vindo do Triage Workbench) */
+  useEffect(() => {
+    const p = readPrefill();
+    if (!p) return;
+    setDraft((d) => ({
+      ...d,
+      canonicalName: typeof p.canonicalName === "string" && p.canonicalName.trim() ? p.canonicalName : d.canonicalName,
+      description: typeof p.description === "string" && p.description.trim() ? p.description : d.description,
+      positiveNote: typeof p.positiveNote === "string" && p.positiveNote.trim() ? p.positiveNote : d.positiveNote,
+      basis: typeof p.basis === "string" && p.basis.trim() ? p.basis : d.basis,
+      rung: typeof p.rung === "number" && p.rung >= 0 && p.rung <= 6 ? p.rung : d.rung,
+      unknowns: Array.isArray(p.unknowns) && p.unknowns.length > 0 ? p.unknowns : d.unknowns,
+      sourceRefs: d.sourceRefs.map((s, i) =>
+        i === 0 ? { ...s, label: p.sourceLabel ?? s.label, whyWeBelieveThis: p.whyWeBelieve ?? s.whyWeBelieveThis } : s,
+      ),
+    }));
+  }, []);
 
   const up = (patch: Partial<IntakeDraft>) => setDraft((d) => ({ ...d, ...patch }));
   const goto = (i: number) => {

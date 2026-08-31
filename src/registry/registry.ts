@@ -478,6 +478,65 @@ export const SEED_RECORDS: BuildingBlockRecord[] = [
     positiveNote: "O elo que faltava no ciclo: intake → diff → triagem → registry. Toda adição futura da constelação pode entrar por aqui, governada e rastreável.",
   }),
 
+  B({
+    id: "tool-treasure-drop",
+    canonicalName: "Captura Rápida / Treasure Drop",
+    family: "Participação",
+    kind: "tool",
+    description:
+      "Superfície de captura humana mínima: palavra, link ou observação — sem Holon, categoria, título ou decisão prévia. Submissão SOMENTE via Edge Function autenticada musa2-node-gateway → /treasure-drop; fail-closed sem sessão; idempotência obrigatória; rascunhos locais com retry. Estados fixados pelo contrato: REPORTED · NONE · QUARANTINED · NOT_ADOPTED · REGISTRATION_NOT_REQUESTED.",
+    sourceRefs: [
+      src({ id: "s-td-src", sourceClass: "local-source", label: "src/apps/TreasureDrop.tsx · src/gateway/treasureDropGateway.ts", role: "primary", access: "public", observedAt: O, whyWeBelieveThis: "Implementado em source; caminho de invocação e proibições (tabela/RPC/service-role) cobertos por testes estáticos e comportamentais." }),
+      src({ id: "s-td-gw", sourceClass: "founder-direction", label: "Gateway musa2-node-gateway v3 · interface musa2-node-v0.2 · dev branch devlabsshieldedtestszone", role: "lineage", access: "metadata-only", observedAt: O, whyWeBelieveThis: "Direção fundadora: IMPLEMENTED_IN_DEV_BRANCH · DB_ROUNDTRIP_TESTED · SECURITY_ADVISOR_PARTIALLY_HARDENED · NOT_INDEPENDENTLY_ASSURED · NOT_PRODUCTION_DEPLOYED." }),
+    ],
+    lifecycle: "IMPLEMENTED_CANDIDATE",
+    currentness: "prototype",
+    evidence: { rung: 3, basis: "Implementação em source + rota local #/captura funcional + suite Vitest executada cobrindo contrato, idempotência, fail-closed e privacidade." },
+    visibility: "public",
+    publicability: "public-safe",
+    route: "/captura",
+    predecessorIds: ["tool-intake-studio"],
+    relatedIds: ["tool-triage-workbench", "crowd-sourced"],
+    capabilities: [
+      { id: "c-td-open", label: "Capturar pensamento/link/observação", availability: "now", action: { kind: "open-route", target: "/captura" } },
+      { id: "c-td-local", label: "Rascunho local + retry idempotente (fallback)", availability: "now" },
+      { id: "c-td-gateway", label: "Submissão ao gateway autenticado", availability: "conditional", note: "Requer sessão Supabase autenticada; indisponível = fail-closed, nunca anônimo." },
+    ],
+    unknowns: [
+      "Gateway NÃO assegurado independentemente nem deployado em produção — receipt real depende de sessão autenticada no substrato de desenvolvimento",
+      "Fila de quarentena ainda não exposta pelo gateway (list/update)",
+    ],
+    positiveNote: "Preserva a espontaneidade humana — “Abiu” vale tanto quanto um dossiê. É a porta de entrada que impede que a arquitetura exija pensamento de esquema antes de contribuição.",
+  }),
+
+  B({
+    id: "tool-triage-workbench",
+    canonicalName: "Triage Workbench",
+    family: "Participação",
+    kind: "tool",
+    description:
+      "Bancada de triagem sobre material em quarentena: camada 1 (fonte bruta, intocável) e camada 2 (interpretação secundária — tags tentativas, ponteiros temáticos múltiplos, destinos múltiplos ou UNCLASSIFIED, perguntas sem resolução). Produz candidatos explícitos com handoff ao Snapshot Diff e ao Intake Studio. Nunca muta o Registry vivo; fila REPRESENTATIVE DEMO isolada atrás de TriageQueueAdapter.",
+    sourceRefs: [
+      src({ id: "s-tw-src", sourceClass: "local-source", label: "src/apps/TriageWorkbench.tsx · src/apps/triageModel.ts", role: "primary", access: "public", observedAt: O, whyWeBelieveThis: "Implementado em source; imutabilidade da fonte bruta e não-mutação do Registry cobertas por testes." }),
+      src({ id: "s-tw-law", sourceClass: "founder-direction", label: "Lei semântica — TRIAGED ≠ ACCEPTED · CANDIDATE ≠ CANON", role: "lineage", access: "public", observedAt: O, whyWeBelieveThis: "Direção fundadora: estrutura vem depois da preservação; interpretação secundária nunca é cânone." }),
+    ],
+    lifecycle: "IMPLEMENTED_CANDIDATE",
+    currentness: "prototype",
+    evidence: { rung: 3, basis: "Implementação em source + rota local #/triage funcional + suite Vitest executada (candidatos, handoffs, privacidade, UNCLASSIFIED)." },
+    visibility: "public",
+    publicability: "public-safe",
+    route: "/triage",
+    predecessorIds: ["tool-treasure-drop", "tool-snapshot-diff"],
+    relatedIds: ["tool-intake-studio", "cap-inspector"],
+    capabilities: [
+      { id: "c-tw-open", label: "Examinar quarentena em camadas", availability: "now", action: { kind: "open-route", target: "/triage" } },
+      { id: "c-tw-diff", label: "Handoff de candidato ao Snapshot Diff", availability: "now", action: { kind: "open-route", target: "/registry" } },
+      { id: "c-tw-intake", label: "Handoff ao Intake Studio (rascunho pré-preenchido)", availability: "now", action: { kind: "open-route", target: "/intake" } },
+    ],
+    unknowns: ["Operações de fila (list/update) dependem de futura exposição pelo gateway — hoje: REPRESENTATIVE DEMO rotulado"],
+    positiveNote: "Transforma quarentena em cuidado: cada captura ganha leitura humana, perguntas e destinos possíveis — sem nunca ser sobrescrita ou adotada à força.",
+  }),
+
   /* ---------------- participação ---------------- */
   ...[
     ["crowd-sourced", "Crowd-Sourced", "Intakes progressivos com consentimento, autoria, provenance e triage.", "Intakes progressivos com autoria e provenance são a porta de entrada ética de toda a arquitetura."],

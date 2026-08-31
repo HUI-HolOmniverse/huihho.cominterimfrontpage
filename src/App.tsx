@@ -11,6 +11,8 @@ import LensPage from "./LensPage";
 import Explorer from "./apps/Explorer";
 import Logoi from "./apps/Logoi";
 import IntakeStudio from "./apps/IntakeStudio";
+import TreasureDrop from "./apps/TreasureDrop";
+import TriageWorkbench from "./apps/TriageWorkbench";
 
 function SkipLink() {
   return (
@@ -95,6 +97,8 @@ export default function App() {
           <Route path="/holomniverse" element={<Explorer />} />
           <Route path="/holo-logoi" element={<Logoi />} />
           <Route path="/intake" element={<IntakeStudio />} />
+          <Route path="/captura" element={<TreasureDrop />} />
+          <Route path="/triage" element={<TriageWorkbench />} />
           <Route path="*" element={<Portal />} />
         </Routes>
       </HashRouter>

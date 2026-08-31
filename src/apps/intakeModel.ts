@@ -283,6 +283,31 @@ export function removeDraft(id: string): IntakeDraft[] {
 
 export const FRAGMENT_KEY = "hui.intake.fragment.v1";
 export const LENS_FOCUS_KEY = "hui.lens.focus.v1";
+export const PREFILL_KEY = "hui.intake.prefill.v1";
+
+export interface IntakePrefill {
+  canonicalName?: string;
+  description?: string;
+  positiveNote?: string;
+  basis?: string;
+  rung?: number;
+  unknowns?: string[];
+  sourceLabel?: string;
+  whyWeBelieve?: string;
+}
+
+/** Consome o prefill uma única vez (Triage Workbench → Intake Studio). */
+export function readPrefill(): IntakePrefill | null {
+  try {
+    const raw = sessionStorage.getItem(PREFILL_KEY);
+    if (!raw) return null;
+    sessionStorage.removeItem(PREFILL_KEY);
+    const p = JSON.parse(raw) as unknown;
+    return p && typeof p === "object" ? (p as IntakePrefill) : null;
+  } catch {
+    return null;
+  }
+}
 
 export function handoffToDiff(fragment: SnapshotFragment): boolean {
   try {
