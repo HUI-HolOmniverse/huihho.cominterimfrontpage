@@ -537,6 +537,86 @@ export const SEED_RECORDS: BuildingBlockRecord[] = [
     positiveNote: "Transforma quarentena em cuidado: cada captura ganha leitura humana, perguntas e destinos possíveis — sem nunca ser sobrescrita ou adotada à força.",
   }),
 
+  B({
+    id: "tool-lineage-graph",
+    canonicalName: "Lineage Graph",
+    family: "Building",
+    kind: "tool",
+    description:
+      "Grafo vivo da constelação: seis tipos de linhagem distinguíveis por traço (fonte, co-criação humana, implementação, asseguramento, deployment, readback) + contradição/não-resolvido/relação. Aresta nunca implica dependência canônica; lifecycle separado de evidência. Navegação por teclado com fallback em lista, realce de caminhos e handoffs a Inspector, Snapshot Diff, Work Ledger e Readback.",
+    sourceRefs: [
+      src({ id: "s-lg-src", sourceClass: "local-source", label: "src/cycle/LineageGraph.tsx · src/cycle/lineageModel.ts", role: "primary", access: "public", observedAt: O, whyWeBelieveThis: "Implementado em source; derivado deterministicamente do registry + âncoras rotuladas; cobertura em suite Vitest." }),
+      src({ id: "s-lg-law", sourceClass: "founder-direction", label: "Direção fundadora — aresta ≠ cânone; tipos de linhagem distinguíveis", role: "lineage", access: "public", observedAt: O, whyWeBelieveThis: "Requisito explícito da tranche Ciclo Vivo." }),
+    ],
+    lifecycle: "IMPLEMENTED_CANDIDATE",
+    currentness: "prototype",
+    evidence: { rung: 3, basis: "Implementação em source + rota local #/linhagem funcional + suite Vitest executada." },
+    visibility: "public",
+    publicability: "public-safe",
+    route: "/linhagem",
+    predecessorIds: ["tool-snapshot-diff", "tool-readback-console"],
+    relatedIds: ["tool-work-ledger", "tool-readback-console", "cap-inspector"],
+    capabilities: [
+      { id: "c-lg-open", label: "Explorar linhagens da constelação", availability: "now", action: { kind: "open-route", target: "/linhagem" } },
+    ],
+    unknowns: ["DEPLOYMENT_LINEAGE com zero arestas reais — nada foi deployado"],
+    positiveNote: "Torna visível o que o registry já sabia: de onde cada bloco vem, quem o tocou e o que permanece em aberto.",
+  }),
+
+  B({
+    id: "tool-work-ledger",
+    canonicalName: "Work Ledger",
+    family: "Building",
+    kind: "tool",
+    description:
+      "Livro-razão do trabalho real: SHAs quando de fato conhecidos (jamais inventados), contribuições humanas e de IA com papéis explícitos (SOURCE_SHARED_BY ≠ AUTHOR), cadeia proposto ≠ implementado ≠ testado ≠ … ≠ readback externo, e a Lente de Co-Criação (padrão Sérgio, DEMO rotulado). Sem rankings, scores ou métricas reputacionais.",
+    sourceRefs: [
+      src({ id: "s-wl-src", sourceClass: "local-source", label: "src/cycle/WorkLedger.tsx · src/cycle/workLedgerModel.ts", role: "primary", access: "public", observedAt: O, whyWeBelieveThis: "Implementado em source; registros com SHAs observados neste ambiente; assertNoRankings coberto por teste." }),
+      src({ id: "s-wl-law", sourceClass: "founder-direction", label: "Direção fundadora — SOURCE_SHARED_BY != AUTHOR; AI visível quando conhecida", role: "lineage", access: "public", observedAt: O, whyWeBelieveThis: "Requisito explícito da tranche Ciclo Vivo." }),
+    ],
+    lifecycle: "IMPLEMENTED_CANDIDATE",
+    currentness: "prototype",
+    evidence: { rung: 3, basis: "Implementação em source + rota local #/ledger funcional + suite Vitest executada." },
+    visibility: "public",
+    publicability: "public-safe",
+    route: "/ledger",
+    predecessorIds: ["tool-intake-studio"],
+    relatedIds: ["tool-lineage-graph", "tool-readback-console"],
+    capabilities: [
+      { id: "c-wl-open", label: "Consultar histórico de trabalho & co-criação", availability: "now", action: { kind: "open-route", target: "/ledger" } },
+    ],
+    unknowns: ["Registros Sérgio são REPRESENTATIVE/DEMO até fonte governada real existir"],
+    positiveNote: "Preserva cronologia, autoria e esforço humano+IA do building — memória viva que evita reescrever o que já foi feito.",
+  }),
+
+  B({
+    id: "tool-readback-console",
+    canonicalName: "Readback Console",
+    family: "Building",
+    kind: "tool",
+    description:
+      "Console de readback externo: observações sobre itens reais com máquina de estados ramificada (OBSERVED → REPORTED → CORROBORATED → VERIFIED, com ramos CONTRADICTED/UNRESOLVED). Nenhuma promoção silenciosa a VERIFIED sem evidência + corroboração + interpretação. Exporta SOMENTE EVIDENCE_CANDIDATE para o Snapshot Diff. READBACK ≠ ACCEPTANCE.",
+    sourceRefs: [
+      src({ id: "s-rb-src", sourceClass: "local-source", label: "src/cycle/ReadbackConsole.tsx · src/cycle/readbackModel.ts", role: "primary", access: "public", observedAt: O, whyWeBelieveThis: "Implementado em source; guardas de transição e export de candidato cobertos por suite Vitest." }),
+      src({ id: "s-rb-law", sourceClass: "founder-direction", label: "Direção fundadora — readback ≠ acceptance; só EVIDENCE_CANDIDATE", role: "lineage", access: "public", observedAt: O, whyWeBelieveThis: "Requisito explícito da tranche Ciclo Vivo." }),
+    ],
+    lifecycle: "IMPLEMENTED_CANDIDATE",
+    currentness: "prototype",
+    evidence: { rung: 3, basis: "Implementação em source + rota local #/readback funcional + suite Vitest executada." },
+    visibility: "public",
+    publicability: "public-safe",
+    route: "/readback",
+    predecessorIds: ["tool-treasure-drop"],
+    successorIds: ["tool-lineage-graph"],
+    relatedIds: ["tool-snapshot-diff", "tool-triage-workbench"],
+    capabilities: [
+      { id: "c-rb-open", label: "Registrar observação externa (OBSERVED)", availability: "now", action: { kind: "open-route", target: "/readback" } },
+      { id: "c-rb-export", label: "Exportar EVIDENCE_CANDIDATE ao Snapshot Diff", availability: "now", action: { kind: "open-route", target: "/registry" } },
+    ],
+    unknowns: ["Readbacks são locais ao protótipo — fila externa de readback ainda não existe"],
+    positiveNote: "Fecha o elo que faltava do ciclo: o exterior pode agora devolver evidência ao interior, sem que observação vire adoção.",
+  }),
+
   /* ---------------- participação ---------------- */
   ...[
     ["crowd-sourced", "Crowd-Sourced", "Intakes progressivos com consentimento, autoria, provenance e triage.", "Intakes progressivos com autoria e provenance são a porta de entrada ética de toda a arquitetura."],

@@ -97,6 +97,21 @@ export function Header({ onLaunch }: { onLaunch: () => void }) {
         </nav>
 
         <div className="ml-auto flex items-center gap-3 sm:gap-4">
+          <nav className="hidden md:flex items-center rounded-lg border border-seam overflow-hidden" aria-label="Ciclo Vivo">
+            {[
+              { href: "#/linhagem", label: "linhagem" },
+              { href: "#/ledger", label: "ledger" },
+              { href: "#/readback", label: "readback" },
+            ].map((l, i) => (
+              <a
+                key={l.href}
+                href={l.href}
+                className={`px-3 py-2 font-mono text-[9px] tracking-[0.16em] uppercase text-mist-500 hover:text-lumen-300 hover:bg-lumen-500/8 transition-colors focus-ring ${i > 0 ? "border-l border-seam" : ""}`}
+              >
+                {l.label}
+              </a>
+            ))}
+          </nav>
           <a
             href="#/captura"
             className="group/cap flex items-center gap-2 px-3 py-2 rounded-lg border border-gild-400/50 text-gild-300 font-mono text-[10px] tracking-[0.14em] uppercase transition-all duration-200 hover:bg-gild-400/10 hover:shadow-[0_0_22px_rgba(217,166,63,0.18)] focus-ring"

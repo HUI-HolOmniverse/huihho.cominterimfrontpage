@@ -128,6 +128,7 @@ export const FAMILIES = [
   "Federadas",
   "Manifestações",
   "Registry",
+  "Building",
 ] as const;
 export type Family = (typeof FAMILIES)[number];
 

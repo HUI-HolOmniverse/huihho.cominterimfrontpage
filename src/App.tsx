@@ -13,6 +13,9 @@ import Logoi from "./apps/Logoi";
 import IntakeStudio from "./apps/IntakeStudio";
 import TreasureDrop from "./apps/TreasureDrop";
 import TriageWorkbench from "./apps/TriageWorkbench";
+import LineageGraph from "./cycle/LineageGraph";
+import WorkLedger from "./cycle/WorkLedger";
+import ReadbackConsole from "./cycle/ReadbackConsole";
 
 function SkipLink() {
   return (
@@ -99,6 +102,9 @@ export default function App() {
           <Route path="/intake" element={<IntakeStudio />} />
           <Route path="/captura" element={<TreasureDrop />} />
           <Route path="/triage" element={<TriageWorkbench />} />
+          <Route path="/linhagem" element={<LineageGraph />} />
+          <Route path="/ledger" element={<WorkLedger />} />
+          <Route path="/readback" element={<ReadbackConsole />} />
           <Route path="*" element={<Portal />} />
         </Routes>
       </HashRouter>
