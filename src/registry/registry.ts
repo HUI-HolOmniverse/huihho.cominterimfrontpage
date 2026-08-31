@@ -537,6 +537,7 @@ export const SEED_RECORDS: BuildingBlockRecord[] = [
     positiveNote: "Transforma quarentena em cuidado: cada captura ganha leitura humana, perguntas e destinos possíveis — sem nunca ser sobrescrita ou adotada à força.",
   }),
 
+  /* CICLO-VIVO-HARVEST-BEGIN — registros do Ciclo Vivo (colheita controlada) */
   B({
     id: "tool-lineage-graph",
     canonicalName: "Lineage Graph",
@@ -616,6 +617,7 @@ export const SEED_RECORDS: BuildingBlockRecord[] = [
     unknowns: ["Readbacks são locais ao protótipo — fila externa de readback ainda não existe"],
     positiveNote: "Fecha o elo que faltava do ciclo: o exterior pode agora devolver evidência ao interior, sem que observação vire adoção.",
   }),
+  /* CICLO-VIVO-HARVEST-END */
 
   /* ---------------- participação ---------------- */
   ...[
