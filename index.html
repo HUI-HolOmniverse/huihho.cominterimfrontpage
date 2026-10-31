@@ -1,1 +1,259 @@
-PLACEHOLDER_WILL_REPLACE
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HUI · Mundo de HUI · Portas Abertas · huihho.com</title>
+  <meta name="description" content="Humanity United International — meta-arquitetura viva. Primeira vida visível: Programa de Abundância. Primeiro evento ontogônico: ICEBERG.">
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: #161e2e;
+      --card-hover: #1f2a40;
+      --border: #2e3a59;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --focus: #f59e0b;
+      --tag: #1e293b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem;
+    }
+    .container { max-width: 1200px; margin: 0 auto; }
+    header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 2.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      gap: 1rem;
+    }
+    .brand h1 {
+      font-size: 1.85rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    .brand p { color: var(--muted); margin-top: 0.35rem; font-size: 0.95rem; max-width: 52ch; }
+    .lang-switcher { display: flex; gap: 0.5rem; }
+    .lang-btn {
+      background: var(--card);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.45rem 0.9rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .lang-btn.active, .lang-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+    .lang-btn:focus-visible, .app-card:focus-visible, .btn:focus-visible {
+      outline: 3px solid var(--focus);
+      outline-offset: 2px;
+    }
+    .intro {
+      margin-bottom: 2.5rem;
+      max-width: 70ch;
+      color: var(--muted);
+    }
+    .intro strong { color: var(--text); }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+    .app-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      text-decoration: none;
+      color: inherit;
+    }
+    .app-card:hover { transform: translateY(-2px); border-color: var(--accent); }
+    .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.75rem; gap: 0.5rem; }
+    .app-name { font-size: 1.2rem; font-weight: 600; }
+    .app-tier {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      background: var(--tag);
+      color: var(--accent);
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      white-space: nowrap;
+    }
+    .app-desc { color: var(--muted); font-size: 0.92rem; margin-bottom: 1rem; flex-grow: 1; }
+    .btn {
+      display: inline-block;
+      background: var(--accent);
+      color: #000;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      text-decoration: none;
+      text-align: center;
+      border: none;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--accent-hover); }
+    .note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 0.5rem;
+      font-style: italic;
+    }
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <h1>HUI · Mundo de HUI</h1>
+        <p data-pt="Meta-arquitetura viva para uma humanidade mais humana. Primeira vida visível: Programa de Abundância. Primeiro evento ontogônico: ICEBERG — International Convergence of Ecosystems Giving Birth to an Era of Regenerative Growth."
+           data-en="Living meta-architecture for a more humane humanity. First visible life: Abundance Program. First ontogonic event: ICEBERG — International Convergence of Ecosystems Giving Birth to an Era of Regenerative Growth.">
+          Meta-arquitetura viva para uma humanidade mais humana. Primeira vida visível: Programa de Abundância. Primeiro evento ontogônico: ICEBERG — International Convergence of Ecosystems Giving Birth to an Era of Regenerative Growth.
+        </p>
+      </div>
+      <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLang('pt')">PT</button>
+        <button class="lang-btn" onclick="setLang('en')">EN</button>
+      </div>
+    </header>
+
+    <section class="intro">
+      <p data-pt="Estas são portas abertas — protótipos, estudos, apresentações e circuitos mínimos viáveis. Cada uma é apresentada com contexto antes da saída. Nada aqui é produto final, serviço operacional ou promessa. São convites para co-criar."
+         data-en="These are open doors — prototypes, studies, presentations and minimum viable circuits. Each is presented with context before exit. Nothing here is a finished product, operational service or promise. They are invitations to co-create.">
+        Estas são portas abertas — protótipos, estudos, apresentações e circuitos mínimos viáveis. Cada uma é apresentada com contexto antes da saída. Nada aqui é produto final, serviço operacional ou promessa. São convites para co-criar.
+      </p>
+    </section>
+
+    <div class="grid" id="doors"></div>
+
+    <footer>
+      <p data-pt="For Everyone, Forever. HUI é processo. A população desta arquitetura permanece em expansão. H2O é o vaso associativo em formação na Suíça."
+         data-en="For Everyone, Forever. HUI is process. The population of this architecture remains expanding. H2O is the associative vessel forming in Switzerland.">
+        For Everyone, Forever. HUI é processo. A população desta arquitetura permanece em expansão. H2O é o vaso associativo em formação na Suíça.
+      </p>
+      <p style="margin-top:0.5rem;">© 2026 Humanity United International · Public Commons surface</p>
+    </footer>
+  </div>
+
+  <script>
+    const doors = [
+      {
+        name: "Ágoras",
+        tier: "L1–L4",
+        pt: "Deliberação sociocrática, rascunho de propostas e consentimento por objeção.",
+        en: "Sociocratic circle deliberation, proposal drafting and objection-based consent.",
+        href: "https://agoras.lovable.app",
+        note: "Protótipo visual de UI · não é serviço de votação ao vivo"
+      },
+      {
+        name: "Holopoly",
+        tier: "L0 / L2",
+        pt: "Simulação de fluxos multi-capital e mecânicas de jogo regenerativas.",
+        en: "Simulation of multi-capital flows and regenerative game mechanics.",
+        href: "https://holopoly.lovable.app/",
+        note: "Protótipo lúdico conceitual · mecânicas completas em desenvolvimento"
+      },
+      {
+        name: "CIESSM",
+        tier: "L0 / L3",
+        pt: "Exploração de fluxos de inteligência socio-ecológica.",
+        en: "Exploration of socio-ecological intelligence streams.",
+        href: "https://ciessm-framework-xwpqixj.gamma.site/",
+        note: "Deck de design · métricas são proposições, não implantações verificadas"
+      },
+      {
+        name: "Holopolis",
+        tier: "L0 / L3",
+        pt: "Mapeamento bioregional e visualização de gêmeos territoriais regenerativos.",
+        en: "Bioregional mapping and regenerative territorial twin visualization.",
+        href: "https://holopolis-collaboration-hub.lovable.app",
+        note: "Estudo de interface · verificar disponibilidade"
+      },
+      {
+        name: "Q-FORCE",
+        tier: "L1–L2",
+        pt: "Coordenação de tarefas e missões regenerativas.",
+        en: "Coordination of regenerative tasks and missions.",
+        href: "https://qforce-buddy-app.lovable.app",
+        note: "UI de staging · sem SSO público ou dashboard ao vivo"
+      },
+      {
+        name: "WTV Café",
+        tier: "L0",
+        pt: "Espaço de encontro, gastronomia e aprendizado no World Trade Village.",
+        en: "Encounter, gastronomy and learning space in the World Trade Village.",
+        href: "https://world-trade-village-k3y7ual.gamma.site/",
+        note: "Conceito de design · não é café operacional"
+      },
+      {
+        name: "Programa de Abundância",
+        tier: "L0",
+        pt: "Fundamentos do Programa de Abundância e modelo de tripé econômico.",
+        en: "Foundations of the Abundance Program and economic tripod model.",
+        href: "https://abundanceprogram.wixsite.com/economic-tripod",
+        note: "Material histórico · recuperar texto completo antes de reivindicação ativa"
+      },
+      {
+        name: "HolOmnisphere / Canvas",
+        tier: "L0",
+        pt: "Mapa estrutural interativo do ecossistema.",
+        en: "Interactive structural map of the ecosystem.",
+        href: "https://ecossistemadoprogramadeabundancia.lovable.app",
+        note: "Visualização estrutural · não são sistemas operacionais ao vivo"
+      }
+    ];
+
+    function renderDoors(lang) {
+      const grid = document.getElementById('doors');
+      grid.innerHTML = doors.map(d => `
+        <a class="app-card" href="${d.href}" target="_blank" rel="noopener">
+          <div class="card-header">
+            <div class="app-name">${d.name}</div>
+            <div class="app-tier">${d.tier}</div>
+          </div>
+          <div class="app-desc">${lang === 'pt' ? d.pt : d.en}</div>
+          <div class="btn">${lang === 'pt' ? 'Abrir porta' : 'Open door'}</div>
+          <div class="note">${d.note}</div>
+        </a>
+      `).join('');
+    }
+
+    function setLang(lang) {
+      document.querySelectorAll('[data-pt]').forEach(el => {
+        el.textContent = el.getAttribute(lang === 'pt' ? 'data-pt' : 'data-en');
+      });
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toLowerCase() === lang);
+      });
+      document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
+      renderDoors(lang);
+    }
+
+    setLang('pt');
+  </script>
+</body>
+</html>
